@@ -1,0 +1,701 @@
+{
+  "format": "cutting-room-recipe",
+  "version": 1,
+  "saved": "2026-07-31T16:45:18.802Z",
+  "name": "ultramarine-31s",
+  "ratio": "4:5",
+  "beat": 300,
+  "text": {
+    "on": true,
+    "lines": "ULTRAMARINE\nBEYOND\nTHE SEA",
+    "palette": "ultramarine",
+    "role": "accent",
+    "size": 82,
+    "nx": 7,
+    "ny": 20,
+    "caption": "ng’ambo ya bahari · badakhshan · lapis lazuli"
+  },
+  "assets": [
+    {
+      "kind": "image",
+      "name": "ultramarine_slice_ridge_v01.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/ridge/ultramarine_slice_ridge_v01.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_slice_ridge_v05.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/ridge/ultramarine_slice_ridge_v05.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_slice_ridge_v06.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/ridge/ultramarine_slice_ridge_v06.png"
+    },
+    {
+      "kind": "image",
+      "name": "crossing-draft.png",
+      "src": "/Collage%20Compositor/exports/crossing-draft.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_cut_stone_v02.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/stone/ultramarine_cut_stone_v02.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_cut_stone_v03.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/stone/ultramarine_cut_stone_v03.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_cut_stone_v06.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/stone/ultramarine_cut_stone_v06.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine-specimen.png",
+      "src": "/Collage%20Compositor/samples/ultramarine-specimen.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_cut_hands_v05.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/hands/ultramarine_cut_hands_v05.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_cut_hands_v04.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/hands/ultramarine_cut_hands_v04.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine-smoke.png",
+      "src": "/Collage%20Compositor/samples/ultramarine-smoke.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_cut_drape_v03.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/drape/ultramarine_cut_drape_v03.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_slice_sea_v08.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/sea/ultramarine_slice_sea_v08.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_slice_sea_v04.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/sea/ultramarine_slice_sea_v04.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_slice_sea_v12.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/sea/ultramarine_slice_sea_v12.png"
+    },
+    {
+      "kind": "image",
+      "name": "sample-a.png",
+      "src": "/Collage%20Compositor/samples/sample-a.png"
+    },
+    {
+      "kind": "image",
+      "name": "crossing-draft-3.png",
+      "src": "/Collage%20Compositor/exports/crossing-draft-3.png"
+    },
+    {
+      "kind": "image",
+      "name": "crossing-draft-2.png",
+      "src": "/Collage%20Compositor/exports/crossing-draft-2.png"
+    },
+    {
+      "kind": "image",
+      "name": "crossing-draft-4.png",
+      "src": "/Collage%20Compositor/exports/crossing-draft-4.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_cut_scale_v07.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/scale/ultramarine_cut_scale_v07.png"
+    },
+    {
+      "kind": "image",
+      "name": "ultramarine_cut_coin_v02.png",
+      "src": "/Collage%20Compositor/fragments/ultramarine/coin/ultramarine_cut_coin_v02.png"
+    },
+    {
+      "kind": "image",
+      "name": "sample-b.png",
+      "src": "/Collage%20Compositor/samples/sample-b.png"
+    },
+    {
+      "kind": "image",
+      "name": "weighing-draft-4.png",
+      "src": "/Collage%20Compositor/exports/weighing-draft-4.png"
+    },
+    {
+      "kind": "image",
+      "name": "weighing-draft-3.png",
+      "src": "/Collage%20Compositor/exports/weighing-draft-3.png"
+    },
+    {
+      "kind": "image",
+      "name": "weighing-draft-2.png",
+      "src": "/Collage%20Compositor/exports/weighing-draft-2.png"
+    },
+    {
+      "kind": "image",
+      "name": "weighing-draft.png",
+      "src": "/Collage%20Compositor/exports/weighing-draft.png"
+    }
+  ],
+  "slides": [
+    {
+      "asset": 0,
+      "zoom": 1,
+      "hold": 4,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 0,
+      "zoom": 2.4,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 1,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 2,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 2,
+      "zoom": 2.8,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 1,
+      "zoom": 1.6,
+      "hold": 2,
+      "motion": "glideR",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 3,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 3,
+      "zoom": 2.2,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 0,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 4,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 4,
+      "zoom": 2.5,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 5,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 5,
+      "zoom": 2.2,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 6,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 6,
+      "zoom": 3,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 7,
+      "zoom": 1,
+      "hold": 4,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 7,
+      "zoom": 2.6,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 7,
+      "zoom": 1.8,
+      "hold": 2,
+      "motion": "glideL",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 4,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 7,
+      "zoom": 3.2,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 8,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 8,
+      "zoom": 2.4,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 9,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 9,
+      "zoom": 2.6,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 10,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "glideR",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 10,
+      "zoom": 2.4,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 11,
+      "zoom": 1,
+      "hold": 4,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 11,
+      "zoom": 2.2,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 10,
+      "zoom": 1.6,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 8,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 12,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "glideR",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 12,
+      "zoom": 2.4,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 13,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "glideL",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 13,
+      "zoom": 2.2,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 14,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "glideR",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 14,
+      "zoom": 2.8,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 15,
+      "zoom": 1,
+      "hold": 4,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 16,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 16,
+      "zoom": 2.4,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 17,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 18,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 12,
+      "zoom": 1.6,
+      "hold": 2,
+      "motion": "glideL",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 19,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 19,
+      "zoom": 2.4,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 20,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 20,
+      "zoom": 3,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 21,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 21,
+      "zoom": 2.6,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 22,
+      "zoom": 1,
+      "hold": 4,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 22,
+      "zoom": 2.2,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 23,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 24,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 25,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 19,
+      "zoom": 1.8,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 21,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "glideR",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 16,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 7,
+      "zoom": 1,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 7,
+      "zoom": 2.8,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 3,
+      "zoom": 1,
+      "hold": 1,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 0,
+      "zoom": 1,
+      "hold": 4,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    },
+    {
+      "asset": 7,
+      "zoom": 1.4,
+      "hold": 2,
+      "motion": "cut",
+      "ax": 0.5,
+      "ay": 0.5,
+      "inPoint": 0
+    }
+  ]
+}

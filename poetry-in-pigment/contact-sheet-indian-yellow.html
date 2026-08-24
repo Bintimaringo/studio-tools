@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Indian Yellow — field contact sheet</title>
+<style>
+  body{ margin:0; background:#bfbfc4; color:#1a1a1e; font-family:"Inter",system-ui,sans-serif; padding:28px 30px 60px; }
+  h1{ font-family:"Playfair Display",Georgia,serif; font-weight:700; font-size:24px; margin:0 0 2px; }
+  .sub{ font-family:"Space Mono",monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#55555c; margin-bottom:26px; }
+  h2{ font-family:"Space Mono",monospace; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:#2a2a30;
+      margin:30px 0 12px; padding-bottom:8px; border-bottom:1px solid #9a9aa0; }
+  h2 span{ color:#6e6e76; text-transform:none; letter-spacing:.02em; }
+  h2.editorial{ border-bottom-color:#6a4a1a; color:#2a1a0a; }
+  h2.editorial span{ color:#8a6a3a; }
+  .family-note{ font-family:"Space Mono",monospace; font-size:10px; color:#44444a; margin:-6px 0 14px;
+    padding:8px 10px; background:#b0b0b8; border-radius:3px; line-height:1.5; }
+  .grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:14px; }
+  @media(max-width:1100px){ .grid{ grid-template-columns:repeat(3,1fr);} }
+  figure{ margin:0; }
+  figure img{ width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:4px; display:block; background:#7a7a80; border:1px solid #8c8c92; }
+  figure.editorial img{ border-color:#8a6a3a; }
+  figcaption{ font-family:"Space Mono",monospace; font-size:10px; color:#44444a; margin-top:6px; letter-spacing:.03em; }
+  figure.keep img{ outline:3px solid #c0392b; outline-offset:-3px; }
+  figure.keep figcaption{ color:#c0392b; font-weight:700; }
+  figure.keep figcaption::after{ content:" ✓ keep"; letter-spacing:.1em; }
+</style>
+</head>
+<body>
+  <h1>Indian Yellow — field contact sheet</h1>
+  <div class="sub">Stage 1 · cull pool · 48 fields (24 BLOOM/SPECIMEN · 24 EDITORIAL) · July 6 batch, labelled by family from run metadata · 5 selected ✓</div>
+
+  <h2>Bloom · Object <span>— for The Disc (centred, filling)</span></h2>
+  <div class="grid" id="bo"></div>
+
+  <h2>Bloom · Lift <span>— for Soft-romance, Vertical (luminous, no black margins)</span></h2>
+  <div class="grid" id="bl"></div>
+
+  <h2>Specimen · Object <span>— for The Edge, Centred-severe (centred subject)</span></h2>
+  <div class="grid" id="so"></div>
+
+  <h2 class="editorial">Editorial · Vessel <span>— severe/object → The Edge, Centred-severe, Monolith, Assay</span></h2>
+  <div class="grid" id="ev"></div>
+
+  <h2 class="editorial">Editorial · Body <span>— romantic/body → Soft-romance, Monolith, Disc (review required before use)</span></h2>
+  <div class="family-note">
+    The "made from a body" charge held obliquely — cull against the two guardrails: evocative never documentary; bearing, not spectacle. The body must read as producing/wearing the colour, never as ill or wounded.
+  </div>
+  <div class="grid" id="eb"></div>
+
+  <h2 class="editorial">Editorial · Burst <span>— uncanny → editorial and loud severe layouts</span></h2>
+  <div class="grid" id="eu"></div>
+
+<script>
+  const V8 = ['v01','v02','v03','v04','v05','v06','v07','v08'];
+  const sets = {
+    bo: V8.map(v=>'indian_yellow_bloom_object_'+v),
+    bl: V8.map(v=>'indian_yellow_bloom_lift_'+v),
+    so: V8.map(v=>'indian_yellow_specimen_object_'+v),
+    ev: V8.map(v=>'indian_yellow_editorial_vessel_'+v),
+    eb: V8.map(v=>'indian_yellow_editorial_body_'+v),
+    eu: V8.map(v=>'indian_yellow_editorial_burst_'+v),
+  };
+  // Cull selections, confirmed 2026-07-06 — one keeper per family; no burst keeper this round
+  const keep = new Set([
+    'indian_yellow_bloom_object_v05',
+    'indian_yellow_bloom_lift_v08',
+    'indian_yellow_specimen_object_v01',
+    'indian_yellow_editorial_vessel_v04',
+    'indian_yellow_editorial_body_v03',
+  ]);
+  for(const [id, names] of Object.entries(sets)){
+    const g = document.getElementById(id);
+    const isEd = id[0] === 'e';
+    names.forEach(n=>{
+      const fig = document.createElement('figure');
+      if(isEd) fig.className = 'editorial';
+      if(keep.has(n)) fig.classList.add('keep');
+      fig.innerHTML = `<img src="fields/indian-yellow/${n}.png" loading="lazy"><figcaption>${n.replace('indian_yellow_','')}</figcaption>`;
+      g.appendChild(fig);
+    });
+  }
+</script>
+</body>
+</html>

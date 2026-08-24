@@ -1,0 +1,62 @@
+{
+  "format": "cutting-room-recipe",
+  "version": 1,
+  "saved": "2026-08-10T21:15:00.000Z",
+  "name": "osmosis-31s",
+  "ratio": "16:9",
+  "beat": 560,
+  "text": {
+    "on": false,
+    "lines": "OSMOSIS\nTWO SHIFTS\nONE SKIN",
+    "palette": "gallery",
+    "role": "accent",
+    "size": 88,
+    "nx": 7,
+    "ny": 20,
+    "caption": "the first breathable deodorant balm · day ritual · night ritual"
+  },
+  "assets": [
+    { "kind": "image", "name": "retail-display.png",   "src": "/osmosis/retail-display.png" },
+    { "kind": "video", "name": "pdp-01-veil.mp4",      "src": "/osmosis/pdp-01-veil.mp4" },
+    { "kind": "image", "name": "billboard-street.png", "src": "/osmosis/billboard-street.png" },
+    { "kind": "video", "name": "pdp-02-lede.mp4",      "src": "/osmosis/pdp-02-lede.mp4" },
+    { "kind": "video", "name": "pdp-03-states.mp4",    "src": "/osmosis/pdp-03-states.mp4" },
+    { "kind": "image", "name": "pack-tube.png",        "src": "/osmosis/pack-tube.png" },
+    { "kind": "image", "name": "night-ritual.png",     "src": "/osmosis/night-ritual.png" },
+    { "kind": "video", "name": "pdp-04-day.mp4",       "src": "/osmosis/pdp-04-day.mp4" },
+    { "kind": "image", "name": "billboard-facade.png", "src": "/osmosis/billboard-facade.png" },
+    { "kind": "video", "name": "pdp-05-night.mp4",     "src": "/osmosis/pdp-05-night.mp4" },
+    { "kind": "video", "name": "pdp-06-cycle.mp4",     "src": "/osmosis/pdp-06-cycle.mp4" },
+    { "kind": "video", "name": "motion-design.mp4",    "src": "/osmosis/motion-design.mp4" },
+    { "kind": "video", "name": "pdp-07-object.mp4",    "src": "/osmosis/pdp-07-object.mp4" },
+    { "kind": "image", "name": "billboard-airport.png","src": "/osmosis/billboard-airport.png" },
+    { "kind": "video", "name": "pdp-08-cta.mp4",       "src": "/osmosis/pdp-08-cta.mp4" }
+  ],
+  "slides": [
+    { "asset": 0,  "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 0,  "zoom": 2.6,  "hold": 2, "motion": "cut",    "ax": 0.6,  "ay": 0.56, "inPoint": 0 },
+
+    { "asset": 1,  "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 2,  "zoom": 1,    "hold": 2, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 3,  "zoom": 1,    "hold": 3, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+
+    { "asset": 4,  "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 5,  "zoom": 1.15, "hold": 2, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 6,  "zoom": 1.6,  "hold": 2, "motion": "cut",    "ax": 0.5,  "ay": 0.72, "inPoint": 0 },
+
+    { "asset": 7,  "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 7,  "zoom": 2.2,  "hold": 1, "motion": "cut",    "ax": 0.5,  "ay": 0.45, "inPoint": 0.6 },
+    { "asset": 8,  "zoom": 1,    "hold": 2, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 9,  "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+
+    { "asset": 10, "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 11, "zoom": 1.2,  "hold": 3, "motion": "glideR", "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+
+    { "asset": 12, "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 12, "zoom": 2.4,  "hold": 1, "motion": "cut",    "ax": 0.3,  "ay": 0.42, "inPoint": 0.8 },
+    { "asset": 13, "zoom": 1,    "hold": 2, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+
+    { "asset": 14, "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 },
+    { "asset": 0,  "zoom": 1,    "hold": 4, "motion": "cut",    "ax": 0.5,  "ay": 0.5,  "inPoint": 0 }
+  ]
+}

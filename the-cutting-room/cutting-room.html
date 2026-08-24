@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Cutting Room — Loop Composer</title>
+
+<!-- Fifth instrument in the family: momentum out of cuts. Stills, detail crops,
+     and short video snippets jump-cut at strobe pace under a locked Humane text
+     block. Raw mp4/webm export; chains into the plate compositor when the loop
+     should be held. Fonts arrive from plate-assets/ (shared with the plate tool). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#1A1A1E; --panel:#161619; --panel-2:#1F1F24; --line:#2C2C32;
+    --ink:#ECECEE; --ink-soft:#9A9AA2; --ink-dim:#6E6E76; --radius:9px;
+    --mono:"Space Mono", ui-monospace, monospace;
+    --ui:"Inter", system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{ display:flex; font-family:var(--ui); color:var(--ink); background:var(--bg);
+    overflow:hidden; -webkit-font-smoothing:antialiased; }
+
+  .sidebar{ width:340px; min-width:340px; height:100vh; overflow-y:auto;
+    background:var(--panel); border-right:1px solid var(--line); padding:22px 22px 60px; }
+  .sidebar::-webkit-scrollbar{width:10px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#2A2A30;border-radius:8px;border:3px solid var(--panel);}
+  .brand h1{ font-family:"Playfair Display", serif; font-weight:700; font-size:21px; margin:2px 0 3px; }
+  .brand .sub{ font-family:var(--mono); font-size:10px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-soft); }
+  .sec{ margin-top:26px; padding-top:22px; border-top:1px solid var(--line); }
+  .sec:first-of-type{border-top:none;}
+  .sec > .label{ font-family:var(--mono); font-size:10.5px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink-dim); margin-bottom:12px;
+    display:flex; justify-content:space-between; align-items:baseline; }
+  .seg{ display:flex; gap:6px; flex-wrap:wrap; }
+  .seg button{ flex:1 1 auto; min-width:0; cursor:pointer; background:var(--panel-2);
+    color:var(--ink-soft); border:1px solid var(--line); border-radius:7px; padding:9px 8px;
+    font-family:var(--ui); font-size:12px; font-weight:500; transition:.12s; white-space:nowrap; }
+  .seg button:hover{ color:var(--ink); border-color:#3a3a42; }
+  .seg button.on{ background:var(--ink); color:#141416; border-color:var(--ink); font-weight:600; }
+  .seg button:disabled{ opacity:.35; pointer-events:none; }
+  input[type=range]{ -webkit-appearance:none; width:100%; height:3px; background:var(--line);
+    border-radius:3px; outline:none; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:14px; height:14px;
+    border-radius:50%; background:var(--ink); cursor:pointer; }
+  .ctrl{ margin-bottom:11px; }
+  .ctrl > .cl{ font-size:10.5px; color:var(--ink-dim); margin-bottom:5px; font-family:var(--mono);
+    letter-spacing:.08em; text-transform:uppercase; display:flex; justify-content:space-between;}
+  .toggle{ display:flex; align-items:center; justify-content:space-between; padding:9px 0; }
+  .toggle .tlabel{ font-size:12.5px; }
+  .switch{ width:38px; height:22px; border-radius:12px; background:var(--line); position:relative;
+    cursor:pointer; transition:.15s; flex:0 0 auto; }
+  .switch::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px;
+    border-radius:50%; background:var(--ink-soft); transition:.15s; }
+  .switch.on{ background:var(--ink); }
+  .switch.on::after{ left:18px; background:#141416; }
+  .spine-note{ font-size:10.5px; color:var(--ink-dim); font-family:var(--mono); margin-top:10px; line-height:1.6; }
+  .field-input{ width:100%; background:var(--panel-2); border:1px solid var(--line); color:var(--ink);
+    border-radius:7px; padding:8px 9px; font-family:var(--ui); font-size:12.5px; resize:vertical; }
+  .field-input:focus{ outline:none; border-color:#45454e; }
+  textarea.field-input{ line-height:1.5; min-height:64px; }
+  .upload-wrap{ position:relative; }
+  .upload-wrap input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .bigbtn{ width:100%; cursor:pointer; background:var(--panel-2); color:var(--ink);
+    border:1px dashed #3a3a42; border-radius:7px; padding:14px 10px; font-size:12.5px;
+    text-align:center; transition:.12s; }
+  .bigbtn:hover{ border-color:#55555f; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .intake{ display:none; margin-top:12px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:7px; padding:10px; }
+  .intake video{ width:100%; border-radius:5px; display:block; margin-bottom:8px; }
+
+  .main{ flex:1; display:flex; flex-direction:column; height:100vh; min-width:0; }
+  .stage{ flex:1; display:flex; align-items:center; justify-content:center; padding:28px;
+    min-height:0; overflow:hidden;
+    background:
+      linear-gradient(45deg,#202024 25%,transparent 25%,transparent 75%,#202024 75%),
+      linear-gradient(45deg,#202024 25%,#1B1B1F 25%,#1B1B1F 75%,#202024 75%);
+    background-size:22px 22px; background-position:0 0,11px 11px; }
+  #stageCanvas{ max-width:100%; max-height:100%; display:block;
+    filter:drop-shadow(0 18px 48px rgba(0,0,0,.55)); }
+  #stageCanvas.editing{ cursor:grab; }
+
+  .strip{ min-height:104px; border-top:1px solid var(--line); background:var(--panel);
+    display:flex; align-items:center; gap:8px; padding:10px 14px; overflow-x:auto; }
+  .strip::-webkit-scrollbar{height:8px;}
+  .strip::-webkit-scrollbar-thumb{background:#2A2A30;border-radius:8px;}
+  .thumb{ position:relative; flex:0 0 auto; height:84px; border-radius:6px; overflow:hidden;
+    border:2px solid transparent; cursor:pointer; background:#0d0d10; }
+  .thumb.sel{ border-color:var(--ink); }
+  .thumb canvas{ height:100%; display:block; }
+  .thumb .badge{ position:absolute; left:4px; bottom:4px; font-family:var(--mono); font-size:9px;
+    background:rgba(0,0,0,.65); color:#ECECEE; padding:2px 5px; border-radius:4px; letter-spacing:.05em; }
+  .strip .empty{ font-family:var(--mono); font-size:11px; color:var(--ink-dim); padding:0 8px; }
+
+  .footer{ height:56px; min-height:56px; border-top:1px solid var(--line); background:var(--panel);
+    display:flex; align-items:center; gap:14px; padding:0 18px; }
+  .footer .name{ font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; color:var(--ink);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex:0 1 auto; }
+  .footer .spacer{ flex:1; }
+  .fbtn{ cursor:pointer; background:var(--panel-2); border:1px solid var(--line); color:var(--ink-soft);
+    border-radius:7px; padding:9px 13px; font-size:12px; font-weight:500; transition:.12s; font-family:var(--ui);}
+  .fbtn:hover{ color:var(--ink); border-color:#3a3a42; }
+  .fbtn.primary{ background:var(--ink); color:#141416; border-color:var(--ink); font-weight:600; }
+  .fbtn[disabled]{ opacity:.4; pointer-events:none; }
+  .status{ font-family:var(--mono); font-size:10.5px; color:var(--ink-dim); }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <h1>The Cutting Room</h1>
+    <div class="sub">Loop Composer · Momentum From Cuts</div>
+  </div>
+
+  <div class="sec">
+    <div class="label">Loop</div>
+    <div class="seg" id="ratioSeg">
+      <button data-r="16:9" class="on">16:9</button>
+      <button data-r="1:1">1:1</button>
+      <button data-r="4:5">4:5</button>
+      <button data-r="9:16">9:16</button>
+    </div>
+    <div class="ctrl" style="margin-top:12px;">
+      <div class="cl"><span>Tempo</span><span id="tempoVal">300ms / beat</span></div>
+      <input type="range" id="tempoRange" min="150" max="800" value="300" />
+    </div>
+    <div class="seg">
+      <button id="playBtn" class="on">Playing</button>
+    </div>
+    <div class="spine-note">Every slide lasts its hold × the beat. Frantic is the default — the glides and holds are what make the cuts land.</div>
+  </div>
+
+  <div class="sec">
+    <div class="label">Slides</div>
+    <div class="upload-wrap">
+      <div class="bigbtn">Drop or choose images / short video</div>
+      <input type="file" id="fileInput" accept="image/*,video/*" multiple />
+    </div>
+    <div class="intake" id="intake">
+      <video id="intakeVideo" muted playsinline></video>
+      <div class="grid2">
+        <button class="fbtn primary" id="captureBtn">Capture next 5s</button>
+        <button class="fbtn" id="intakeCancel">Cancel</button>
+      </div>
+      <div class="spine-note" id="intakeNote">Playing live. Capture grabs the next five seconds from this moment.</div>
+    </div>
+
+    <div id="slideCtrls" style="display:none; margin-top:16px;">
+      <div class="ctrl">
+        <div class="cl"><span>Hold</span></div>
+        <div class="seg" id="holdSeg">
+          <button data-h="1" class="on">×1</button>
+          <button data-h="2">×2</button>
+          <button data-h="4">×4</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="cl"><span>Motion</span></div>
+        <div class="seg" id="motionSeg">
+          <button data-m="cut" class="on">Cut</button>
+          <button data-m="glideL">Glide ◀</button>
+          <button data-m="glideR">Glide ▶</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="cl"><span>Zoom</span><span id="zoomVal">1.00×</span></div>
+        <input type="range" id="zoomRange" min="100" max="400" value="100" />
+      </div>
+      <div class="ctrl" id="inCtrl" style="display:none;">
+        <div class="cl"><span>In-point</span><span id="inVal">0.0s</span></div>
+        <input type="range" id="inRange" min="0" max="100" value="0" />
+      </div>
+      <div class="grid2" style="margin-bottom:6px;">
+        <button class="fbtn" id="detailBtn">Detail cut</button>
+        <button class="fbtn" id="dupBtn">Duplicate</button>
+      </div>
+      <div class="grid2">
+        <div class="grid2" style="gap:6px;">
+          <button class="fbtn" id="moveL">◀</button>
+          <button class="fbtn" id="moveR">▶</button>
+        </div>
+        <button class="fbtn" id="delBtn">Delete</button>
+      </div>
+      <div class="spine-note">Selected slide is frozen for editing — drag the frame to place the crop, scroll to zoom. Press play to feel it in the loop.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="label">Text</div>
+    <div class="toggle">
+      <span class="tlabel">Locked text block</span>
+      <div class="switch" id="textSwitch"></div>
+    </div>
+    <div id="textCtrls" style="display:none;">
+      <div class="ctrl">
+        <div class="cl"><span>Lines · one per row</span></div>
+        <textarea class="field-input" id="textLines" rows="4"></textarea>
+      </div>
+      <div class="ctrl">
+        <div class="cl"><span>Palette</span></div>
+        <div class="seg" id="palSeg"></div>
+      </div>
+      <div class="ctrl">
+        <div class="cl"><span>Colour role</span></div>
+        <div class="seg" id="roleSeg">
+          <button data-c="accent" class="on">Accent</button>
+          <button data-c="ink">Ink</button>
+          <button data-c="paper">Paper</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="cl"><span>Size</span><span id="sizeVal"></span></div>
+        <input type="range" id="sizeRange" min="40" max="220" value="96" />
+      </div>
+      <div class="grid2">
+        <div class="ctrl">
+          <div class="cl"><span>Nudge X</span></div>
+          <input type="range" id="nudgeX" min="0" max="60" value="8" />
+        </div>
+        <div class="ctrl">
+          <div class="cl"><span>Nudge Y</span></div>
+          <input type="range" id="nudgeY" min="5" max="70" value="24" />
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="cl"><span>Small line · bottom</span></div>
+        <input class="field-input" id="captionInput" placeholder="optional" />
+      </div>
+      <div class="spine-note">Humane, stacked, locked over every cut. Colour comes from the palette — one voice per loop.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="label">Composition</div>
+    <div class="ctrl">
+      <div class="cl"><span>Name</span></div>
+      <input class="field-input" id="recipeName" placeholder="untitled" />
+    </div>
+    <div class="grid2">
+      <button class="fbtn" id="saveRecipe">Save recipe</button>
+      <div class="upload-wrap">
+        <button class="fbtn" style="width:100%;">Load recipe</button>
+        <input type="file" id="recipeInput" accept="application/json,.json" />
+      </div>
+    </div>
+    <div id="relink" style="display:none; margin-top:10px;">
+      <div class="spine-note" id="relinkNote"></div>
+      <div class="upload-wrap" style="margin-top:8px;">
+        <button class="fbtn" style="width:100%;">Choose the missing files</button>
+        <input type="file" id="relinkInput" multiple accept="image/*,video/*" />
+      </div>
+    </div>
+    <button class="fbtn" id="freshBtn" style="width:100%; margin-top:6px;">Start fresh</button>
+    <div class="spine-note">Autosaved continuously — the arrangement comes back if the tab reloads or closes. A recipe saves it as a small file to <b>recipes/</b>, so versions can sit side by side.</div>
+  </div>
+
+  <div class="sec">
+    <div class="label">Export</div>
+    <div class="seg" id="lenSeg">
+      <button data-l="1" class="on">One loop</button>
+      <button data-l="15">≈15s</button>
+    </div>
+    <div class="spine-note">Raw mp4/webm, up to 2048px, straight to exports/ — no compositor involved. Drop the file into The Hand Presenting the Work when the loop should be held.</div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="stage"><canvas id="stageCanvas"></canvas></div>
+  <div class="strip" id="strip"><span class="empty">The strip is empty — add slides, or the boot demo is loading.</span></div>
+  <div class="footer">
+    <div class="name" id="loopInfo">—</div>
+    <div class="spacer"></div>
+    <div class="status" id="statusLine"></div>
+    <button class="fbtn primary" id="exportBtn">Export video</button>
+  </div>
+</main>
+
+<script>
+(() => {
+const ASSETS = 'plate-assets/';
+const EXPORT_LONG = 2048;
+const GLIDE_TRAVEL = 0.5;   // fraction of free crop space a glide covers over its hold
+const $ = id => document.getElementById(id);
+
+// family palettes — carried from the collage compositor verbatim
+const PALETTES = [
+  { key:'archive',          label:'Archive',     ground:'#EDE5D6', paper:'#F4EEE1', ink:'#191511', accent:'#C8331B' },
+  { key:'signal',           label:'Signal',      ground:'#DD6B39', paper:'#EFE6D2', ink:'#211C15', accent:'#191511' },
+  { key:'gallery',          label:'Gallery',     ground:'#111013', paper:'#ECE8DF', ink:'#111013', accent:'#D8D2C4' },
+  { key:'ledger',           label:'Ledger',      ground:'#E9E4D8', paper:'#F2EDE2', ink:'#17130E', accent:'#4CBB8C' },
+  { key:'ultramarine',      label:'Ultramarine', ground:'#ECEEF6', paper:'#EEF0FB', ink:'#141633', accent:'#22379B' },
+  { key:'ultramarine-deep', label:'Ultra Deep',  ground:'#0A0C1C', paper:'#EEF0FB', ink:'#0A0C1C', accent:'#4B63E0' },
+  { key:'hold-binti',       label:'Hold·Binti',  ground:'#1A1410', paper:'#F8EBEE', ink:'#1A1410', accent:'#F8EBEE' },
+  { key:'hold-doja',        label:'Hold·Doja',   ground:'#1A1410', paper:'#F8EBEE', ink:'#1A1410', accent:'#D4C227' },
+];
+const RATIOS = { '16:9':[16,9], '1:1':[1,1], '4:5':[4,5], '9:16':[9,16] };
+
+const state = {
+  ratio: '16:9', beat: 300, playing: true,
+  slides: [], sel: -1,
+  text: false, lines: 'THE\nCUTTING\nROOM', palette: 4, role: 'accent',
+  size: 96, nx: 8, ny: 24, caption: '',
+  exportLen: 1, exporting: false,
+};
+
+const stageCanvas = $('stageCanvas'), sctx = stageCanvas.getContext('2d');
+function status(m){ $('statusLine').textContent = m || ''; }
+
+// ---- slide model ----------------------------------------------------------
+// slide: { kind:'image'|'video', el, w, h, name, hold, motion, zoom, ax, ay, inPoint, dur }
+function makeSlide(kind, el, w, h, name){
+  return { kind, el, w, h, name, hold: 1, motion: 'cut', zoom: 1, ax: .5, ay: .5, inPoint: 0, dur: kind === 'video' ? el.duration : 0 };
+}
+function loopLen(){ return state.slides.reduce((a, s) => a + s.hold * state.beat, 0); }
+function slideAt(t){
+  let acc = 0;
+  for (const s of state.slides){
+    const d = s.hold * state.beat;
+    if (t < acc + d) return { s, p: (t - acc) / d };
+    acc += d;
+  }
+  return { s: state.slides[state.slides.length - 1], p: 1 };
+}
+
+// ---- drawing --------------------------------------------------------------
+function canvasSize(long){
+  const [rw, rh] = RATIOS[state.ratio];
+  return rw >= rh ? [long, Math.round(long * rh / rw)] : [Math.round(long * rw / rh), long];
+}
+function drawSlide(ctx, W, H, s, p){
+  const fw = s.w, fh = s.h;
+  let zoom = s.zoom;
+  if (s.motion !== 'cut' && zoom < 1.15) zoom = 1.15;   // glide needs crop headroom
+  const cover = Math.max(W / fw, H / fh) * zoom;
+  const cw = W / cover, ch = H / cover;
+  let ax = s.ax;
+  if (s.motion !== 'cut'){
+    const dir = s.motion === 'glideL' ? -1 : 1;
+    ax = Math.min(1, Math.max(0, s.ax + dir * GLIDE_TRAVEL * (p - 0.5)));
+  }
+  const sx = (fw - cw) * ax, sy = (fh - ch) * s.ay;
+  ctx.drawImage(s.el, sx, sy, cw, ch, 0, 0, W, H);
+}
+function drawText(ctx, W, H){
+  if (!state.text) return;
+  const pal = PALETTES[state.palette];
+  const col = pal[state.role];
+  const size = state.size / 1000 * H * 2.2;
+  const x = state.nx / 100 * W;
+  let y = state.ny / 100 * H + size * 0.8;
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.fillStyle = col;
+  ctx.letterSpacing = (size * 0.01).toFixed(1) + 'px';
+  ctx.font = '700 ' + size + 'px Humane';
+  for (const line of state.lines.split('\n')){
+    if (line.trim()) ctx.fillText(line.toUpperCase(), x, y);
+    y += size * 0.88;                                   // locked display leading
+  }
+  const cap = state.caption.trim();
+  if (cap){
+    const cs = Math.max(11, 0.02 * H);
+    ctx.letterSpacing = (cs * 0.12).toFixed(1) + 'px';
+    ctx.font = '400 ' + cs + 'px "PT Root UI"';
+    ctx.fillText(cap.toUpperCase(), x, H - cs * 1.6);
+  }
+  ctx.restore();
+  ctx.letterSpacing = '0px';
+}
+function render(ctx, W, H, t){
+  if (ctx.canvas.width !== W){ ctx.canvas.width = W; ctx.canvas.height = H; }
+  if (!state.slides.length){
+    ctx.fillStyle = '#0d0d10'; ctx.fillRect(0, 0, W, H);
+    return;
+  }
+  const frozen = !state.playing && state.sel >= 0;
+  const { s, p } = frozen ? { s: state.slides[state.sel], p: 0.5 } : slideAt(t % loopLen());
+  syncVideo(s, frozen);
+  drawSlide(ctx, W, H, s, p);
+  drawText(ctx, W, H);
+}
+
+// video slides: play while active, hold at in-point while frozen
+let activeVideo = null;
+function syncVideo(s, frozen){
+  const v = s.kind === 'video' ? s.el : null;
+  if (activeVideo && activeVideo !== v){ activeVideo.pause(); activeVideo = null; }
+  if (!v) return;
+  if (frozen){
+    if (!v.paused) v.pause();
+    if (Math.abs(v.currentTime - s.inPoint) > 0.3) v.currentTime = s.inPoint;
+  } else if (v.paused || v.ended){
+    v.currentTime = s.inPoint;
+    v.play().catch(() => {});
+  }
+  activeVideo = v;
+}
+
+// ---- preview loop ---------------------------------------------------------
+let t0 = performance.now();
+function tick(now){
+  if (!state.exporting){
+    const [W, H] = canvasSize(1100);
+    render(sctx, W, H, now - t0);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ---- filmstrip ------------------------------------------------------------
+function rebuildStrip(){
+  const strip = $('strip');
+  strip.innerHTML = '';
+  if (!state.slides.length){
+    strip.innerHTML = '<span class="empty">The strip is empty — add images or a short video.</span>';
+  }
+  state.slides.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb' + (i === state.sel ? ' sel' : '');
+    const c = document.createElement('canvas');
+    const th = 84, tw = Math.round(th * 16 / 10);
+    c.width = tw; c.height = th;
+    drawSlide(c.getContext('2d'), tw, th, s, 0.5);
+    div.appendChild(c);
+    const b = document.createElement('div');
+    b.className = 'badge';
+    b.textContent = (s.kind === 'video' ? '▸ ' : '') + '×' + s.hold + (s.motion !== 'cut' ? ' ~' : '');
+    div.appendChild(b);
+    div.onclick = () => selectSlide(i);
+    strip.appendChild(div);
+  });
+  $('loopInfo').textContent = state.slides.length
+    ? state.slides.length + ' cuts · loop ' + (loopLen() / 1000).toFixed(1) + 's · ' + state.ratio
+    : '—';
+  scheduleAutosave();   // every mutation path ends here
+}
+function selectSlide(i){
+  state.sel = i;
+  setPlaying(false);
+  $('slideCtrls').style.display = '';
+  const s = state.slides[i];
+  [...$('holdSeg').children].forEach(b => b.classList.toggle('on', +b.dataset.h === s.hold));
+  [...$('motionSeg').children].forEach(b => b.classList.toggle('on', b.dataset.m === s.motion));
+  $('zoomRange').value = Math.round(s.zoom * 100);
+  $('zoomVal').textContent = s.zoom.toFixed(2) + '×';
+  $('inCtrl').style.display = s.kind === 'video' ? '' : 'none';
+  if (s.kind === 'video'){
+    $('inRange').max = Math.max(0, Math.floor((s.dur - 0.4) * 10));
+    $('inRange').value = Math.round(s.inPoint * 10);
+    $('inVal').textContent = s.inPoint.toFixed(1) + 's';
+  }
+  rebuildStrip();
+}
+function setPlaying(on){
+  state.playing = on;
+  $('playBtn').textContent = on ? 'Playing' : 'Paused';
+  $('playBtn').classList.toggle('on', on);
+  if (on){ state.sel = -1; $('slideCtrls').style.display = 'none'; t0 = performance.now(); rebuildStrip(); }
+}
+
+// ---- intake ---------------------------------------------------------------
+// drop anywhere in the window — the hidden-input-only drop target was too easy to miss
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => {
+  e.preventDefault();
+  if (!e.dataTransfer.files.length) return;
+  const input = $('fileInput');
+  input.files = e.dataTransfer.files;
+  input.dispatchEvent(new Event('change'));
+});
+
+$('fileInput').addEventListener('change', async e => {
+  for (const file of e.target.files){
+    if (file.type.startsWith('video')) await intakeVideo(file);
+    else await intakeImage(file);
+  }
+  e.target.value = '';
+  rebuildStrip();
+});
+function intakeImage(file){
+  return new Promise(res => {
+    const im = new Image();
+    im.onload = () => {
+      tagAsset(im, file.name, null, file);
+      state.slides.push(makeSlide('image', im, im.naturalWidth, im.naturalHeight, file.name));
+      res();
+    };
+    im.src = URL.createObjectURL(file);
+  });
+}
+// videos are normalized at intake: captured live into a clean seekable clip (≤5s)
+let intakeSource = null;
+function intakeVideo(file){
+  return new Promise(res => {
+    const v = document.createElement('video');
+    v.src = URL.createObjectURL(file); v.muted = true; v.playsInline = true;
+    v.onloadedmetadata = async () => {
+      if (v.duration <= 5.2){
+        await v.play();
+        status('preparing clip…');
+        await captureClip(v, Math.min(5, v.duration), file.name);
+        status('');
+        res();
+      } else {
+        // long source: live intake — the user marks the moment, we grab the next 5s
+        intakeSource = { v, name: file.name, done: res };
+        $('intake').style.display = '';
+        $('intakeVideo').src = v.src;
+        $('intakeVideo').play();
+      }
+    };
+  });
+}
+$('captureBtn').addEventListener('click', async () => {
+  if (!intakeSource) return;
+  const shown = $('intakeVideo');
+  $('captureBtn').setAttribute('disabled', '');
+  status('capturing 5s…');
+  await captureClip(shown, 5, intakeSource.name);
+  status('');
+  closeIntake();
+});
+$('intakeCancel').addEventListener('click', closeIntake);
+function closeIntake(){
+  $('intakeVideo').pause();
+  $('intake').style.display = 'none';
+  $('captureBtn').removeAttribute('disabled');
+  if (intakeSource){ intakeSource.done(); intakeSource = null; }
+  rebuildStrip();
+}
+function captureClip(sourceEl, seconds, name){
+  return new Promise(resolve => {
+    const stream = sourceEl.captureStream ? sourceEl.captureStream(30) : sourceEl.mozCaptureStream(30);
+    const mime = ['video/webm;codecs=vp9', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m));
+    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 10_000_000 });
+    const chunks = [];
+    rec.ondataavailable = ev => ev.data.size && chunks.push(ev.data);
+    rec.onstop = () => {
+      const clip = document.createElement('video');
+      const clipBlob = new Blob(chunks, { type: mime });
+      clip.src = URL.createObjectURL(clipBlob);
+      tagAsset(clip, name, null, clipBlob);
+      clip.muted = true; clip.playsInline = true;
+      clip.onloadedmetadata = () => {
+        // MediaRecorder blobs report Infinity until forced to the end once
+        if (!isFinite(clip.duration)){
+          clip.currentTime = 1e7;
+          clip.ontimeupdate = () => {
+            clip.ontimeupdate = null;
+            finish(clip);
+          };
+        } else finish(clip);
+      };
+      const finish = clip2 => {
+        clip2.currentTime = 0;
+        const s = makeSlide('video', clip2, sourceEl.videoWidth, sourceEl.videoHeight, name);
+        s.dur = isFinite(clip2.duration) ? clip2.duration : seconds;
+        state.slides.push(s);
+        rebuildStrip();
+        resolve();
+      };
+    };
+    rec.start(200);
+    setTimeout(() => rec.stop(), seconds * 1000);
+  });
+}
+
+// ---- composition persistence ----------------------------------------------
+// Two layers: an autosave (IndexedDB, survives reload/close, carries the actual
+// bytes of dropped files) and a recipe file (portable JSON, versions side by
+// side). Assets fetched from the project folder are stored by path and refetched;
+// files dropped from elsewhere have no path, so their bytes ride in the autosave
+// and a recipe asks for them back by name.
+const RECIPE_FORMAT = 'cutting-room-recipe', RECIPE_VERSION = 1;
+const DB_NAME = 'cutting-room', STORE = 'sessions';
+
+function tagAsset(el, name, src, blob){ el.__name = name; el.__src = src || null; el.__blob = blob || null; return el; }
+
+function idb(){
+  return new Promise((res, rej) => {
+    const q = indexedDB.open(DB_NAME, 1);
+    q.onupgradeneeded = () => { const db = q.result; if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+}
+async function idbSet(k, v){ const db = await idb(); return new Promise((res, rej) => {
+  const t = db.transaction(STORE, 'readwrite'); t.objectStore(STORE).put(v, k);
+  t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
+async function idbGet(k){ const db = await idb(); return new Promise((res, rej) => {
+  const t = db.transaction(STORE, 'readonly'); const q = t.objectStore(STORE).get(k);
+  q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
+async function idbClear(){ const db = await idb(); return new Promise((res, rej) => {
+  const t = db.transaction(STORE, 'readwrite'); t.objectStore(STORE).clear();
+  t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
+
+function assetIndex(){
+  const els = [], idx = new Map();
+  for (const s of state.slides){
+    if (!idx.has(s.el)){ idx.set(s.el, els.length); els.push(s.el); }
+  }
+  return { els, idx };
+}
+function serialize(){
+  const { els, idx } = assetIndex();
+  return {
+    format: RECIPE_FORMAT, version: RECIPE_VERSION, saved: new Date().toISOString(),
+    name: ($('recipeName').value || '').trim(),
+    ratio: state.ratio, beat: state.beat,
+    text: { on: state.text, lines: state.lines, palette: PALETTES[state.palette].key,
+            role: state.role, size: state.size, nx: state.nx, ny: state.ny, caption: state.caption },
+    assets: els.map(el => ({
+      kind: state.slides.find(s => s.el === el).kind,
+      name: el.__name || '', src: el.__src || null })),
+    slides: state.slides.map(s => ({ asset: idx.get(s.el), zoom: +s.zoom.toFixed(3), hold: s.hold,
+      motion: s.motion, ax: +s.ax.toFixed(4), ay: +s.ay.toFixed(4), inPoint: +(s.inPoint || 0).toFixed(2) })),
+  };
+}
+function loadImageEl(src){ return new Promise((res, rej) => {
+  const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error(src)); im.src = src; }); }
+function loadVideoEl(src){ return new Promise((res, rej) => {
+  const v = document.createElement('video'); v.muted = true; v.playsInline = true;
+  v.onloadedmetadata = () => res(v); v.onerror = () => rej(new Error(src)); v.src = src; }); }
+
+let pendingRecipe = null;
+// blobs: optional array indexed like recipe.assets, for assets with no path
+async function applyRecipe(r, blobs){
+  if (!r || r.format !== RECIPE_FORMAT) throw new Error('not a Cutting Room recipe');
+  const els = [], missing = [];
+  for (let i = 0; i < r.assets.length; i++){
+    const a = r.assets[i];
+    let el = null;
+    try {
+      const blob = blobs && blobs[i];
+      const src = blob ? URL.createObjectURL(blob) : a.src;
+      if (src) el = a.kind === 'video' ? await loadVideoEl(src) : await loadImageEl(src);
+      if (el) tagAsset(el, a.name, a.src, blob || null);
+    } catch { el = null; }
+    if (!el) missing.push(a.name || ('asset ' + i));
+    els.push(el);
+  }
+  state.slides = [];
+  for (const sl of r.slides){
+    const el = els[sl.asset]; if (!el) continue;
+    const a = r.assets[sl.asset];
+    const kind = a.kind === 'video' ? 'video' : 'image';
+    const w = kind === 'video' ? el.videoWidth : el.naturalWidth;
+    const h = kind === 'video' ? el.videoHeight : el.naturalHeight;
+    const s = makeSlide(kind, el, w, h, a.name);
+    s.zoom = sl.zoom ?? 1; s.hold = sl.hold || 1; s.motion = sl.motion || 'cut';
+    s.ax = sl.ax ?? .5; s.ay = sl.ay ?? .5; s.inPoint = sl.inPoint || 0;
+    if (kind === 'video') s.dur = isFinite(el.duration) ? el.duration : 5;
+    state.slides.push(s);
+  }
+  if (r.ratio in RATIOS) state.ratio = r.ratio;
+  if (r.beat) state.beat = r.beat;
+  const t = r.text || {};
+  state.text = !!t.on;
+  if (t.lines != null) state.lines = t.lines;
+  const pi = PALETTES.findIndex(p => p.key === t.palette);
+  if (pi >= 0) state.palette = pi;
+  if (t.role) state.role = t.role;
+  if (t.size) state.size = t.size;
+  if (t.nx != null) state.nx = t.nx;
+  if (t.ny != null) state.ny = t.ny;
+  state.caption = t.caption || '';
+  state.sel = -1;
+  syncControls();
+  rebuildStrip();
+  setPlaying(true);
+  pendingRecipe = missing.length ? r : null;
+  $('relink').style.display = missing.length ? '' : 'none';
+  if (missing.length) $('relinkNote').textContent =
+    missing.length + ' file' + (missing.length > 1 ? 's' : '') + ' not found: ' + missing.slice(0,4).join(', ') +
+    (missing.length > 4 ? '…' : '') + '. These came from outside the project folder — choose them to relink.';
+  return missing;
+}
+function syncControls(){
+  [...$('ratioSeg').children].forEach(b => b.classList.toggle('on', b.dataset.r === state.ratio));
+  $('tempoRange').value = state.beat; $('tempoVal').textContent = state.beat + 'ms / beat';
+  $('textSwitch').classList.toggle('on', state.text);
+  $('textCtrls').style.display = state.text ? '' : 'none';
+  $('textLines').value = state.lines;
+  [...$('palSeg').children].forEach((b, i) => b.classList.toggle('on', i === state.palette));
+  [...$('roleSeg').children].forEach(b => b.classList.toggle('on', b.dataset.c === state.role));
+  $('sizeRange').value = state.size; $('sizeVal').textContent = state.size;
+  $('nudgeX').value = state.nx; $('nudgeY').value = state.ny;
+  $('captionInput').value = state.caption;
+}
+
+let autosaveTimer = null, autosaveReady = false;
+function scheduleAutosave(){
+  if (!autosaveReady) return;
+  if (state.slides.length && state.slides.every(s => s.el.__demo)) return;  // don't persist the boot demo
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(async () => {
+    try {
+      if (!state.slides.length){ await idbClear(); return; }
+      const { els } = assetIndex();
+      // only carry bytes for assets with no path — the rest refetch on restore
+      const blobs = els.map(el => el.__src ? null : (el.__blob || null));
+      await idbSet('last', { recipe: serialize(), blobs });
+    } catch (e) { /* quota or private mode — recipes still work */ }
+  }, 1200);
+}
+
+$('saveRecipe').addEventListener('click', async () => {
+  if (!state.slides.length){ status('nothing to save yet'); return; }
+  const r = serialize();
+  const base = (r.name || 'untitled').replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+  const detached = r.assets.filter(a => !a.src).length;
+  await saveBlob(new Blob([JSON.stringify(r, null, 2)], { type: 'application/json' }), (base || 'untitled') + '.json');
+  if (detached) $('statusLine').textContent += ' · ' + detached + ' asset(s) have no project path, so a load will ask for them';
+});
+$('recipeInput').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  e.target.value = '';
+  try {
+    status('loading recipe…');
+    const r = JSON.parse(await f.text());
+    const missing = await applyRecipe(r);
+    $('recipeName').value = r.name || '';
+    autosaveReady = true; scheduleAutosave();
+    status(missing.length ? ('loaded · ' + missing.length + ' asset(s) need relinking')
+                          : ('loaded ' + (r.name || 'recipe') + ' · ' + state.slides.length + ' cuts'));
+  } catch (err){ status('recipe failed: ' + err.message); }
+});
+$('relinkInput').addEventListener('change', async e => {
+  const files = [...e.target.files]; e.target.value = '';
+  if (!files.length || !pendingRecipe) return;
+  const byName = new Map(files.map(f => [f.name, f]));
+  const blobs = pendingRecipe.assets.map(a => byName.get(a.name) || null);
+  const missing = await applyRecipe(pendingRecipe, blobs);
+  scheduleAutosave();
+  status(missing.length ? (missing.length + ' still missing') : ('relinked · ' + state.slides.length + ' cuts'));
+});
+$('freshBtn').addEventListener('click', async () => {
+  state.slides = []; state.sel = -1; pendingRecipe = null;
+  $('relink').style.display = 'none'; $('recipeName').value = '';
+  await idbClear();
+  rebuildStrip(); setPlaying(true);
+  status('cleared — drop in new material');
+});
+
+// ---- controls -------------------------------------------------------------
+$('ratioSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.ratio = b.dataset.r;
+  [...$('ratioSeg').children].forEach(x => x.classList.toggle('on', x === b));
+  rebuildStrip();
+});
+$('tempoRange').addEventListener('input', e => {
+  state.beat = +e.target.value;
+  $('tempoVal').textContent = state.beat + 'ms / beat';
+  rebuildStrip();
+});
+$('playBtn').addEventListener('click', () => setPlaying(!state.playing));
+
+function selSlide(){ return state.sel >= 0 ? state.slides[state.sel] : null; }
+$('holdSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'), s = selSlide(); if (!b || !s) return;
+  s.hold = +b.dataset.h;
+  [...$('holdSeg').children].forEach(x => x.classList.toggle('on', x === b));
+  rebuildStrip();
+});
+$('motionSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'), s = selSlide(); if (!b || !s) return;
+  s.motion = b.dataset.m;
+  [...$('motionSeg').children].forEach(x => x.classList.toggle('on', x === b));
+  rebuildStrip();
+});
+$('zoomRange').addEventListener('input', e => {
+  const s = selSlide(); if (!s) return;
+  s.zoom = e.target.value / 100;
+  $('zoomVal').textContent = s.zoom.toFixed(2) + '×';
+  rebuildStrip();
+});
+$('inRange').addEventListener('input', e => {
+  const s = selSlide(); if (!s || s.kind !== 'video') return;
+  s.inPoint = e.target.value / 10;
+  $('inVal').textContent = s.inPoint.toFixed(1) + 's';
+  s.el.currentTime = s.inPoint;
+});
+$('detailBtn').addEventListener('click', () => {
+  const s = selSlide(); if (!s) return;
+  const d = Object.assign(makeSlide(s.kind, s.el, s.w, s.h, s.name), {
+    hold: 1, motion: 'cut', zoom: Math.min(4, s.zoom * 2.2), ax: s.ax, ay: s.ay, inPoint: s.inPoint, dur: s.dur });
+  state.slides.splice(state.sel + 1, 0, d);
+  selectSlide(state.sel + 1);
+});
+$('dupBtn').addEventListener('click', () => {
+  const s = selSlide(); if (!s) return;
+  state.slides.splice(state.sel + 1, 0, Object.assign({}, s));
+  selectSlide(state.sel + 1);
+});
+$('moveL').addEventListener('click', () => moveSel(-1));
+$('moveR').addEventListener('click', () => moveSel(1));
+function moveSel(d){
+  const i = state.sel, j = i + d;
+  if (i < 0 || j < 0 || j >= state.slides.length) return;
+  [state.slides[i], state.slides[j]] = [state.slides[j], state.slides[i]];
+  selectSlide(j);
+}
+$('delBtn').addEventListener('click', () => {
+  if (state.sel < 0) return;
+  state.slides.splice(state.sel, 1);
+  state.sel = -1; $('slideCtrls').style.display = 'none';
+  setPlaying(true); rebuildStrip();
+});
+
+// crop editing on the frozen frame
+let pan = null;
+stageCanvas.addEventListener('pointerdown', e => {
+  const s = selSlide(); if (!s || state.playing) return;
+  pan = { x: e.clientX, y: e.clientY, ax: s.ax, ay: s.ay };
+  stageCanvas.setPointerCapture(e.pointerId);
+});
+stageCanvas.addEventListener('pointermove', e => {
+  const s = selSlide(); if (!pan || !s) return;
+  const r = stageCanvas.getBoundingClientRect();
+  s.ax = Math.min(1, Math.max(0, pan.ax - (e.clientX - pan.x) / r.width * 1.4));
+  s.ay = Math.min(1, Math.max(0, pan.ay - (e.clientY - pan.y) / r.height * 1.4));
+});
+stageCanvas.addEventListener('pointerup', () => { pan = null; rebuildStrip(); });
+stageCanvas.addEventListener('wheel', e => {
+  const s = selSlide(); if (!s || state.playing) return;
+  e.preventDefault();
+  s.zoom = Math.min(4, Math.max(1, s.zoom * (e.deltaY < 0 ? 1.06 : 0.94)));
+  $('zoomRange').value = Math.round(s.zoom * 100);
+  $('zoomVal').textContent = s.zoom.toFixed(2) + '×';
+}, { passive: false });
+
+// text controls
+$('textSwitch').addEventListener('click', () => {
+  state.text = !state.text;
+  $('textSwitch').classList.toggle('on', state.text);
+  $('textCtrls').style.display = state.text ? '' : 'none';
+});
+$('textLines').value = state.lines;
+$('textLines').addEventListener('input', e => state.lines = e.target.value);
+PALETTES.forEach((p, i) => {
+  const b = document.createElement('button');
+  b.textContent = p.label;
+  b.className = i === state.palette ? 'on' : '';
+  b.onclick = () => {
+    state.palette = i;
+    [...$('palSeg').children].forEach((x, j) => x.classList.toggle('on', j === i));
+  };
+  $('palSeg').appendChild(b);
+});
+$('roleSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.role = b.dataset.c;
+  [...$('roleSeg').children].forEach(x => x.classList.toggle('on', x === b));
+});
+$('sizeRange').addEventListener('input', e => { state.size = +e.target.value; $('sizeVal').textContent = state.size; });
+$('sizeVal').textContent = state.size;
+$('nudgeX').addEventListener('input', e => state.nx = +e.target.value);
+$('nudgeY').addEventListener('input', e => state.ny = +e.target.value);
+$('captionInput').addEventListener('input', e => state.caption = e.target.value);
+
+$('lenSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.exportLen = +b.dataset.l;
+  [...$('lenSeg').children].forEach(x => x.classList.toggle('on', x === b));
+});
+
+// text and tempo controls don't touch the filmstrip, so catch them here
+document.querySelector('.sidebar').addEventListener('input', scheduleAutosave);
+document.querySelector('.sidebar').addEventListener('click', scheduleAutosave);
+
+// ---- export ---------------------------------------------------------------
+async function saveBlob(blob, name){
+  const folder = /\.json$/.test(name) ? 'recipes/' : 'exports/';
+  try {
+    const r = await fetch('/save?name=' + encodeURIComponent(name), { method: 'POST', body: blob });
+    if (r.ok){ status('saved to ' + folder + name); return; }
+    throw new Error();
+  } catch {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    status('downloaded ' + name);
+  }
+}
+$('exportBtn').addEventListener('click', async () => {
+  if (!state.slides.length || state.exporting) return;
+  state.exporting = true;
+  setPlaying(true);
+  $('exportBtn').setAttribute('disabled', '');
+  const [W, H] = canvasSize(EXPORT_LONG);
+  const c = document.createElement('canvas');
+  const ctx = c.getContext('2d');
+  render(ctx, W, H, 0);
+  // captureStream(0) + explicit requestFrame: a jump-cut loop is static between
+  // cuts, and auto-capture only emits on pixel change — we drive every frame.
+  const stream = c.captureStream(0);
+  const track = stream.getVideoTracks()[0];
+  const mime = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm']
+    .find(m => MediaRecorder.isTypeSupported(m));
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 14_000_000 });
+  const chunks = [];
+  rec.ondataavailable = ev => ev.data.size && chunks.push(ev.data);
+  const done = new Promise(r => rec.onstop = r);
+  const L = loopLen();
+  const total = state.exportLen === 1 ? L : Math.ceil(15000 / L) * L;
+  rec.start(250);
+  let start = performance.now();
+  // a hidden tab freezes rAF — pause the recorder and the clock so the
+  // export survives tab switches instead of writing frozen time
+  let hiddenAt = 0;
+  const onVis = () => {
+    if (document.hidden){ hiddenAt = performance.now(); if (rec.state === 'recording') rec.pause(); }
+    // only credit hidden time we actually measured — a "visible" event with no
+    // preceding "hidden" would otherwise add the whole page uptime to the clock
+    else if (hiddenAt){
+      start += performance.now() - hiddenAt; hiddenAt = 0;
+      if (rec.state === 'paused') rec.resume();
+    }
+  };
+  document.addEventListener('visibilitychange', onVis);
+  await new Promise(res => {
+    const step = now => {
+      if (document.hidden){ requestAnimationFrame(step); return; }
+      const t = now - start;
+      render(ctx, W, H, t);
+      if (track.requestFrame) track.requestFrame();
+      status('recording… ' + (t / 1000).toFixed(1) + 's / ' + (total / 1000).toFixed(1) + 's');
+      if (t >= total) res(); else requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+  document.removeEventListener('visibilitychange', onVis);
+  // stamp the closing frame so the last hold keeps its full duration
+  render(ctx, W, H, total - 1);
+  if (track.requestFrame) track.requestFrame();
+  await new Promise(r => setTimeout(r, 150));
+  rec.stop(); await done;
+  const ext = mime.startsWith('video/mp4') ? 'mp4' : 'webm';
+  const name = 'cutting-room-' + state.ratio.replace(':', 'x') + '-' + Date.now().toString(36) + '.' + ext;
+  await saveBlob(new Blob(chunks, { type: mime }), name);
+  state.exporting = false;
+  $('exportBtn').removeAttribute('disabled');
+});
+
+// ---- boot demo ------------------------------------------------------------
+// procedural slides so the instrument demonstrates itself (family precedent)
+async function boot(){
+  const humane = new FontFace('Humane', 'url(' + ASSETS + 'Humane-VF.ttf)', { weight: '100 900' });
+  const ptroot = new FontFace('PT Root UI', 'url(' + ASSETS + 'PT-Root-UI-Regular.ttf)');
+  // House faces are licensed per seat and are not distributed with this tool.
+  // If they are absent the instrument still runs; only the typography falls back.
+  await Promise.allSettled([
+    humane.load().then(f => document.fonts.add(f)),
+    ptroot.load().then(f => document.fonts.add(f)),
+  ]);
+  // an autosaved session outranks the demo — nothing should vanish on reload
+  try {
+    const saved = await idbGet('last');
+    if (saved && saved.recipe && saved.recipe.slides && saved.recipe.slides.length){
+      const missing = await applyRecipe(saved.recipe, saved.blobs);
+      if (state.slides.length){
+        $('recipeName').value = saved.recipe.name || '';
+        autosaveReady = true;
+        status('restored last session · ' + state.slides.length + ' cuts'
+          + (missing.length ? ' · ' + missing.length + ' need relinking' : ''));
+        requestAnimationFrame(tick);
+        return;
+      }
+    }
+  } catch (e) { /* fall through to the demo */ }
+
+  const pal = PALETTES[4]; // Ultramarine demo material
+  const specs = [
+    d => { d.fillStyle = pal.ink; d.fillRect(0,0,1280,720); d.fillStyle = pal.accent; d.beginPath(); d.arc(880,300,260,0,7); d.fill(); },
+    d => { d.fillStyle = pal.ground; d.fillRect(0,0,1280,720); d.fillStyle = pal.ink; for (let i=0;i<5;i++) d.fillRect(120,90+i*120,900-i*140,52); },
+    d => { d.fillStyle = pal.accent; d.fillRect(0,0,1280,720); d.fillStyle = pal.paper; d.beginPath(); d.arc(300,500,180,0,7); d.fill(); },
+    d => { d.fillStyle = pal.ink; d.fillRect(0,0,1280,720); d.fillStyle = pal.paper; for (let i=0;i<9;i++) d.fillRect(90+i*130,0,54,720); },
+  ];
+  for (const paint of specs){
+    const c = document.createElement('canvas'); c.width = 1280; c.height = 720;
+    paint(c.getContext('2d'));
+    const im = new Image();
+    await new Promise(r => { im.onload = r; im.src = c.toDataURL(); });
+    tagAsset(im, 'demo', null, null); im.__demo = true;
+    state.slides.push(makeSlide('image', im, 1280, 720, 'demo'));
+  }
+  state.slides[1].hold = 2;
+  state.slides[2].motion = 'glideR';
+  state.slides[2].zoom = 1.3;
+  rebuildStrip();
+  autosaveReady = true;
+  requestAnimationFrame(tick);
+}
+boot().catch(e => status('boot failed: ' + e.message));
+})();
+</script>
+</body>
+</html>

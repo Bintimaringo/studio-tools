@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Poetry in Pigment</title>
+
+<!-- Voices: data-driven font references. Swap via @font-face later without touching layouts. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;700&family=Playfair+Display:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#1A1A1E;            /* studio workspace */
+    --panel:#161619;        /* sidebar */
+    --panel-2:#1F1F24;      /* inset controls */
+    --line:#2C2C32;
+    --ink:#ECECEE;
+    --ink-soft:#9A9AA2;
+    --ink-dim:#6E6E76;
+    --accent:#D8D8DC;
+    --radius:9px;
+    --mono:"Space Mono", ui-monospace, monospace;
+    --ui:"Inter", system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    display:flex; font-family:var(--ui); color:var(--ink);
+    background:var(--bg); overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:340px; min-width:340px; height:100vh; overflow-y:auto;
+    background:var(--panel); border-right:1px solid var(--line);
+    padding:22px 22px 60px;
+  }
+  .sidebar::-webkit-scrollbar{width:10px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#2A2A30;border-radius:8px;border:3px solid var(--panel);}
+
+  .brand h1{
+    font-family:"Playfair Display", serif; font-weight:700;
+    font-size:25px; margin:2px 0 3px; letter-spacing:.2px;
+  }
+  .brand .sub{ font-family:var(--mono); font-size:10.5px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-soft); }
+
+  .sec{ margin-top:26px; padding-top:22px; border-top:1px solid var(--line); }
+  .sec:first-of-type{border-top:none;}
+  .sec > .label{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink-dim); margin-bottom:12px;
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .sec > .label .hint{ letter-spacing:.04em; text-transform:none; font-size:10px; color:var(--ink-dim); }
+
+  /* generic controls */
+  .seg{ display:flex; gap:6px; flex-wrap:wrap; }
+  .seg button, .pill{
+    flex:1 1 auto; min-width:0; cursor:pointer;
+    background:var(--panel-2); color:var(--ink-soft);
+    border:1px solid var(--line); border-radius:7px;
+    padding:9px 8px; font-family:var(--ui); font-size:12px; font-weight:500;
+    transition:.12s; white-space:nowrap;
+  }
+  .seg button:hover,.pill:hover{ color:var(--ink); border-color:#3a3a42; }
+  .seg button.on,.pill.on{ background:var(--ink); color:#141416; border-color:var(--ink); font-weight:600; }
+
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .row{ display:flex; gap:6px; align-items:center; }
+
+  .iconbtn{
+    cursor:pointer; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--ink-soft); border-radius:7px; padding:8px 10px; font-size:13px;
+    transition:.12s; line-height:1;
+  }
+  .iconbtn:hover{ color:var(--ink); border-color:#3a3a42; }
+
+  .layoutgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:6px; }
+  .layoutgrid button{ text-align:left; display:flex; gap:8px; align-items:center; }
+  .layoutgrid button .n{ font-family:var(--mono); font-size:10px; opacity:.7; }
+
+  .field-readout{ font-family:var(--mono); font-size:11px; color:var(--ink-soft);
+    text-align:center; flex:1; padding:8px 0; letter-spacing:.05em; }
+
+  input[type=range]{ -webkit-appearance:none; width:100%; height:3px; background:var(--line);
+    border-radius:3px; outline:none; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:14px; height:14px;
+    border-radius:50%; background:var(--ink); cursor:pointer; }
+
+  .ctrl{ margin-bottom:11px; }
+  .ctrl > .cl{ font-size:10.5px; color:var(--ink-dim); margin-bottom:5px; font-family:var(--mono);
+    letter-spacing:.08em; text-transform:uppercase; display:flex; justify-content:space-between;}
+  .field-input{
+    width:100%; background:var(--panel-2); border:1px solid var(--line); color:var(--ink);
+    border-radius:7px; padding:8px 9px; font-family:var(--ui); font-size:12.5px; resize:vertical;
+  }
+  textarea.field-input{ line-height:1.5; min-height:62px; }
+  .field-input:focus{ outline:none; border-color:#45454e; }
+
+  .toggle{ display:flex; align-items:center; justify-content:space-between; padding:9px 0;
+    border-bottom:1px solid var(--line); }
+  .toggle:last-child{ border-bottom:none; }
+  .toggle .tlabel{ font-size:12.5px; }
+  .toggle .tsub{ font-size:10px; color:var(--ink-dim); font-family:var(--mono); margin-top:2px;}
+  .switch{ width:38px; height:22px; border-radius:12px; background:var(--line); position:relative;
+    cursor:pointer; transition:.15s; flex:0 0 auto; }
+  .switch::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px;
+    border-radius:50%; background:var(--ink-soft); transition:.15s; }
+  .switch.on{ background:var(--ink); }
+  .switch.on::after{ left:18px; background:#141416; }
+
+  .spine-note{ font-size:10.5px; color:var(--ink-dim); font-family:var(--mono); margin-top:10px;
+    line-height:1.6; }
+
+  .upload-wrap{ position:relative; }
+  .upload-wrap input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+
+  /* ---------- WORKSPACE ---------- */
+  .main{ flex:1; display:flex; flex-direction:column; height:100vh; min-width:0; }
+  .stage{ flex:1; display:flex; align-items:center; justify-content:center; padding:34px;
+    min-height:0; overflow:hidden; }
+  .posterBox{ position:relative; filter:drop-shadow(0 24px 60px rgba(0,0,0,.55)); }
+  .poster{ position:relative; overflow:hidden; transform-origin:top left; }
+
+  /* poster-internal type primitives that must also exist in export CSS */
+  .poster sub{ font-size:.60em; line-height:0; vertical-align:-0.16em; font-weight:inherit; }
+  .poster *{ font-style:normal !important; } /* hard requirement: no italics anywhere */
+  .kanga{ position:absolute; writing-mode:vertical-rl; text-orientation:sideways;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px; letter-spacing:.34em;
+    text-transform:uppercase; white-space:nowrap; overflow:hidden; }
+
+  /* ---------- FOOTER ---------- */
+  .footer{ height:56px; min-height:56px; border-top:1px solid var(--line); background:var(--panel);
+    display:flex; align-items:center; gap:14px; padding:0 18px; }
+  .footer .name{ font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; color:var(--ink); }
+  .footer .num{ color:var(--ink-dim); }
+  .footer .spacer{ flex:1; }
+  .fbtn{ cursor:pointer; background:var(--panel-2); border:1px solid var(--line); color:var(--ink-soft);
+    border-radius:7px; padding:9px 13px; font-size:12px; font-weight:500; transition:.12s; font-family:var(--ui);}
+  .fbtn:hover{ color:var(--ink); border-color:#3a3a42; }
+  .fbtn.primary{ background:var(--ink); color:#141416; border-color:var(--ink); font-weight:600; }
+  .fbtn.primary:hover{ background:#fff; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <h1>Poetry in Pigment</h1>
+    <div class="sub">Binti Maringo · Maabara</div>
+  </div>
+
+  <!-- PIGMENT -->
+  <div class="sec">
+    <div class="label">Pigment</div>
+    <div class="seg" id="pigmentSeg"></div>
+  </div>
+
+  <!-- FIELD -->
+  <div class="sec">
+    <div class="label">Field <span class="hint">your supplied imagery</span></div>
+    <div class="row" style="margin-bottom:8px;">
+      <button class="iconbtn" id="fieldPrev">‹</button>
+      <div class="field-readout" id="fieldReadout">Field 1 / 3</div>
+      <button class="iconbtn" id="fieldNext">›</button>
+      <button class="iconbtn" id="fieldShuffle" title="Reshuffle field">⟳</button>
+    </div>
+    <div class="pill upload-wrap" style="text-align:center;margin-bottom:12px;display:block;">
+      Upload field image
+      <input type="file" id="fieldUpload" accept="image/*" />
+    </div>
+    <div class="ctrl">
+      <div class="cl"><span>Scale</span><span id="scaleVal">1.00×</span></div>
+      <input type="range" id="fieldScale" min="0.6" max="2.4" step="0.02" value="1" />
+    </div>
+    <div class="ctrl">
+      <div class="cl"><span>Position</span><button class="iconbtn" id="posReset" style="padding:2px 7px;font-size:10px;">reset</button></div>
+      <div class="grid2">
+        <button class="pill" id="posUp">↑</button>
+        <button class="pill" id="posDown">↓</button>
+        <button class="pill" id="posLeft">←</button>
+        <button class="pill" id="posRight">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APERTURE FILL -->
+  <div class="sec">
+    <div class="label">Aperture fill <span class="hint">for The Aperture</span></div>
+    <div class="seg" id="apSrcSeg" style="margin-bottom:8px;">
+      <button data-apsrc="field">Pigment field</button>
+      <button data-apsrc="upload">Pattern</button>
+    </div>
+    <div class="pill upload-wrap" style="text-align:center;margin-bottom:12px;display:block;">
+      Upload pattern image
+      <input type="file" id="apUpload" accept="image/*" />
+    </div>
+    <div class="ctrl">
+      <div class="cl"><span>Fill scale</span><span id="apScaleVal">1.00×</span></div>
+      <input type="range" id="apScale" min="0.6" max="3" step="0.02" value="1" />
+    </div>
+    <div class="ctrl">
+      <div class="cl"><span>Fill position</span><button class="iconbtn" id="apPosReset" style="padding:2px 7px;font-size:10px;">reset</button></div>
+      <div class="grid2">
+        <button class="pill" id="apUp">↑</button>
+        <button class="pill" id="apDown">↓</button>
+        <button class="pill" id="apLeft">←</button>
+        <button class="pill" id="apRight">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="sec">
+    <div class="label">Layout <span class="hint" id="layoutHint">1 / 10</span></div>
+    <div class="layoutgrid" id="layoutGrid"></div>
+    <div class="row" style="margin-top:8px;">
+      <button class="pill" id="shuffleBtn">Shuffle</button>
+      <button class="pill" id="surpriseBtn">Surprise</button>
+    </div>
+  </div>
+
+  <!-- VOICE -->
+  <div class="sec">
+    <div class="label">Voice <span class="hint">romantic ↔ severe</span></div>
+    <div class="seg" id="voiceSeg">
+      <button data-voice="serif">Emberly</button>
+      <button data-voice="grotesk">Being</button>
+    </div>
+    <div class="ctrl" style="margin-top:12px;">
+      <div class="cl"><span>Name scale</span><span><button class="iconbtn" id="typeScaleReset" style="padding:2px 7px;font-size:10px;">reset</button> <span id="typeScaleVal">1.00×</span></span></div>
+      <input type="range" id="typeScale" min="0.7" max="1.5" step="0.02" value="1" />
+    </div>
+  </div>
+
+  <!-- TEXT -->
+  <div class="sec">
+    <div class="label">Text <span class="hint">live · editable</span></div>
+    <div id="textFields"></div>
+  </div>
+
+  <!-- MOVES -->
+  <div class="sec">
+    <div class="label">Moves <span class="hint">keep it sparse</span></div>
+    <div id="movesWrap"></div>
+    <div class="spine-note">Spine (always on): formula-as-hero · the HELD line.</div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="sec">
+    <div class="label">Canvas</div>
+    <div class="seg" id="ratioSeg">
+      <button data-ratio="3:4">3 : 4</button>
+      <button data-ratio="A4">A4</button>
+      <button data-ratio="4:5">4 : 5</button>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="sec">
+    <div class="label">Export</div>
+    <button class="pill" id="exportBtn2" style="width:100%;padding:11px;">Export PNG (high-res)</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="stage" id="stage">
+    <div class="posterBox" id="posterBox">
+      <div class="poster" id="poster"></div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="name"><span id="footName">Anchor</span> <span class="num" id="footNum">· Layout 1 / 10</span></div>
+    <div class="spacer" style="flex:1"></div>
+    <button class="fbtn" id="prevBtn">‹ Prev</button>
+    <button class="fbtn" id="nextBtn">Next ›</button>
+    <button class="fbtn" id="shuffleBtn2">Shuffle</button>
+    <button class="fbtn" id="surpriseBtn2">Surprise</button>
+    <button class="fbtn primary" id="exportBtn">Export PNG</button>
+  </div>
+</main>
+
+<script>
+"use strict";
+
+/* ============================================================
+   COLOUR HELPERS
+   ============================================================ */
+function hx(c){c=c.replace('#','');return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
+function toHex(a){return '#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');}
+function lighten(c,a){const [r,g,b]=hx(c);return toHex([r+(255-r)*a,g+(255-g)*a,b+(255-b)*a]);}
+function darken(c,a){const [r,g,b]=hx(c);return toHex([r*(1-a),g*(1-a),b*(1-a)]);}
+function rgba(c,a){const [r,g,b]=hx(c);return `rgba(${r},${g},${b},${a})`;}
+
+/* ============================================================
+   TEXT HELPERS
+   ============================================================ */
+function escapeHtml(s){return (s==null?'':String(s)).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+// Hard requirement: render typed digits as true subscript typography.
+// Formula renders in the mono voice (IBM Plex Mono) regardless of the active display voice —
+// the chemical line is technical data, not expressive type. Subscripts stay tool-rendered.
+function formatFormula(s){ return `<span style="font-family:'IBM Plex Mono', ui-monospace, monospace">${escapeHtml(s).replace(/(\d+)/g,'<sub>$1</sub>')}</span>`; }
+// Decompose a formula into element-units: Na8Al6Si6O24S2 -> [Na8][Al6][Si6][O24][S2].
+// Each unit is one atom group (symbol + stoichiometry) — the natural module for the Assay layout.
+function parseFormula(s){
+  const out=[]; const re=/([A-Z][a-z]*)(\d*)/g; let m;
+  while((m=re.exec(s))!==null){
+    if(m.index===re.lastIndex) re.lastIndex++;   // guard against empty-match loop
+    if(m[1]) out.push({el:m[1], sub:m[2]||''});
+  }
+  return out;
+}
+
+/* ============================================================
+   VOICES — data objects, font-family strings only.
+   Layouts reference the active voice, never fonts directly.
+   ============================================================ */
+const VOICES = {
+  // Paid faces (Emberly, Being) render locally via FontBook — referenced by installed family
+  // name, NOT embedded. IBM Plex Mono (open-license) carries formula + HELD and is web-loaded.
+  serif:   { name:'Emberly', display:'"Emberly", Georgia, serif',          body:'"Emberly", Georgia, serif',           mono:'"IBM Plex Mono", ui-monospace, monospace' },
+  grotesk: { name:'Being',   display:'"Being", "Arial Narrow", sans-serif', body:'"Inter", "Helvetica Neue", sans-serif', mono:'"IBM Plex Mono", ui-monospace, monospace' }
+};
+
+/* ============================================================
+   PIGMENTS — each sets field pool, true colours, pre-filled text.
+   Append more objects to extend the series.
+   ============================================================ */
+const PIGMENTS = [
+  {
+    key:'ultramarine', label:'Ultramarine',
+    colors:{ color:'#22379B', accent:'#4B63E0', ink:'#141633', paper:'#ECEEF6', dark:'#0A0C1C', onDark:'#EEF0FB' },
+    content:{
+      name:'Ultramarine',
+      swahili:"Ng'ambo ya bahari",
+      formula:'Na8Al6Si6O24S2',
+      annotation:'the blue is a flaw in the crystal',
+      receipt:"Mined from one mountain.\nGround and washed for weeks\nto yield a thimble of blue.\nAn ounce against an ounce of gold.",
+      held:'the stone, paid in gold.',
+      binomial:'Lapis lazuli · Badakhshan',
+      kanga:"ng'ambo ya bahari · kutoka mbali · beyond the sea",
+      series:'Pigment I'
+    }
+  },
+  {
+    key:'indian-yellow', label:'Indian Yellow',
+    colors:{ color:'#E3A21A', accent:'#A12E0C', ink:'#2A1A00', paper:'#F8F1E1', dark:'#16100A', onDark:'#F6E9C5' },
+    content:{
+      name:'Indian Yellow',
+      swahili:'Manjano',
+      formula:'C19H16O11',
+      annotation:"a mammal's body used as machine",
+      receipt:"One animal, fed only mango leaves.\nDenied water, to concentrate the urine.\nThe colour scraped from the ground\nand pressed into balls.",
+      held:'one animal, starved, Munger.',
+      binomial:'Mangifera indica · Munger, Bihar',
+      kanga:'manjano · Munger · amber to crimson-black',
+      series:'Pigment II'
+    }
+  },
+  {
+    key:'indigo', label:'Indigo',
+    colors:{ color:'#27406F', accent:'#5C7AB0', ink:'#101D33', paper:'#E9ECF2', dark:'#0A1120', onDark:'#DFE5F0' },
+    content:{
+      name:'Indigo',
+      swahili:'Nili',
+      formula:'C16H10N2O2',
+      annotation:'the blue that was a wound',
+      receipt:'"Not a chest of indigo reached England\nwithout being stained\nwith human blood."\n— 1860',
+      held:'the blue that was a wound, Bengal.',
+      binomial:'Indigofera tinctoria · Bengal',
+      kanga:'nili · mikono ya rangi · hands of dye · Bengal',
+      series:'Pigment III'
+    }
+  },
+  {
+    key:'permanganate', label:'Permanganate',
+    colors:{ color:'#9A2C72', accent:'#1F8A85', ink:'#1C0816', paper:'#F3EAF0', dark:'#150712', onDark:'#F1DCEB' },
+    content:{
+      name:'Potassium Permanganate',
+      swahili:'',
+      formula:'KMnO4',
+      annotation:'',
+      receipt:'',
+      held:'',
+      binomial:'',
+      kanga:'magenta dissolving to teal',
+      series:'Pigment IV'
+    }
+  }
+];
+
+const RATIOS = { '3:4':{w:3,h:4}, 'A4':{w:1,h:1.414}, '4:5':{w:4,h:5} };
+const BASE_W = 1000;
+
+/* ============================================================
+   PLACEHOLDER FIELDS — a soft pigment bloom per pigment, so
+   layouts read before real imagery is uploaded. Same pipeline
+   as uploads (a data URL into the field pool).
+   ============================================================ */
+function makePlaceholder(pal, variant){
+  const W=1200, H=1500;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const x=cv.getContext('2d');
+  x.fillStyle=darken(pal.color,0.66); x.fillRect(0,0,W,H);
+  const spots=[[0.50,0.42,0.95],[0.36,0.58,0.85],[0.66,0.34,1.05]];
+  const [px,py,rs]=spots[variant%spots.length];
+  const cx=W*px, cy=H*py, r=W*rs;
+  let g=x.createRadialGradient(cx,cy,0,cx,cy,r);
+  g.addColorStop(0, lighten(pal.color,0.50));
+  g.addColorStop(0.34, pal.color);
+  g.addColorStop(0.74, darken(pal.color,0.42));
+  g.addColorStop(1, darken(pal.color,0.72));
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+  // secondary accent bloom, additive
+  x.globalCompositeOperation='lighter';
+  const ax=W*(1-px), ay=H*(py+0.18), ar=W*0.5;
+  let g2=x.createRadialGradient(ax,ay,0,ax,ay,ar);
+  g2.addColorStop(0, rgba(pal.accent,0.55));
+  g2.addColorStop(1, rgba(pal.accent,0));
+  x.fillStyle=g2; x.fillRect(0,0,W,H);
+  x.globalCompositeOperation='source-over';
+  // fine grain
+  const grain=18;
+  for(let i=0;i<5200;i++){
+    const gx=Math.random()*W, gy=Math.random()*H;
+    x.fillStyle=`rgba(${Math.random()<0.5?0:255},${Math.random()<0.5?0:255},${Math.random()<0.5?0:255},${Math.random()*0.018})`;
+    x.fillRect(gx,gy,grain/9,grain/9);
+  }
+  return cv.toDataURL('image/png');
+}
+
+/* ============================================================
+   GRID — Müller-Brockmann modular substructure.
+   ~7% margins · 6 columns · baseline grid. Everything snaps.
+   ============================================================ */
+function geo(W,H){
+  const margin = Math.round(W*0.07);
+  const gutter = 16;
+  const cols = 6;
+  const colW = (W - margin*2 - gutter*(cols-1))/cols;
+  const baseline = 22;
+  const liveH = H - margin*2;
+  const rows = Math.floor(liveH/baseline);
+  return {
+    W,H,margin,gutter,cols,colW,baseline,liveH,rows,
+    colX:i=>margin + i*(colW+gutter),
+    spanW:n=>n*colW + (n-1)*gutter,
+    // fraction of live height, snapped to baseline
+    fy:f=>margin + Math.round((liveH*f)/baseline)*baseline
+  };
+}
+
+// element factory bound to a grid + voice + default ink
+function mkAdd(g, fonts, defColor){
+  return function(parent, content, o){
+    o=o||{};
+    const e=document.createElement('div');
+    e.style.position='absolute';
+    const left = (o.x!=null)?o.x:g.colX(o.c||0);
+    e.style.left=left+'px';
+    const width = (o.w!=null)?o.w:(o.span!=null?g.spanW(o.span):null);
+    if(width!=null) e.style.width=width+'px';
+    e.style.top=(o.top!=null?o.top:0)+'px';
+    // name scale: dials only elements tagged role:'name'; fit:true still caps to column width
+    const ts=(o.role==='name')?state.typeScale:1;
+    const size=Math.round((o.size||16)*ts);
+    e.style.fontSize=size+'px';
+    e.style.fontWeight=o.weight||400;
+    e.style.lineHeight=(o.lh!=null?Math.round(o.lh*ts):Math.round(size*1.18))+'px';
+    e.style.fontFamily=fonts[o.font||'body'];
+    e.style.color=o.color||defColor;
+    e.style.textAlign=o.align||'left';
+    if(o.tracking) e.style.letterSpacing=o.tracking;
+    if(o.transform) e.style.textTransform=o.transform;
+    if(o.white) e.style.whiteSpace=o.white;
+    if(o.rotate){ e.style.transformOrigin=o.origin||'left top'; e.style.transform=`rotate(${o.rotate}deg)`; }
+    if(o.raw) e.innerHTML=content; else e.textContent=content;
+    if(o.css) Object.assign(e.style,o.css);
+    parent.appendChild(e);
+    // Hero-formula auto-fit: shrink to the column width so long formulas
+    // (e.g. Na8Al6Si6O24S2) never clip, and short ones (KMnO4) stay big.
+    if(o.fit && width!=null){
+      e.style.whiteSpace='nowrap';
+      let s=size;
+      while(e.scrollWidth>width && s>14){ s-=2; e.style.fontSize=s+'px'; e.style.lineHeight=s+'px'; }
+    }
+    return e;
+  };
+}
+
+function heldHTML(c){ return `<span style="font-family:'IBM Plex Mono', ui-monospace, monospace"><span style="font-weight:700;letter-spacing:.13em">HELD</span>&nbsp;&nbsp;${escapeHtml(c.held)}</span>`; }
+
+function addKanga(layer,g,c,color){
+  if(!c.kanga) return;
+  const e=document.createElement('div'); e.className='kanga';
+  e.style.left=(g.margin*0.40)+'px'; e.style.top=g.margin+'px'; e.style.height=g.liveH+'px';
+  e.style.color=color;
+  let s=''; const unit=c.kanga+'      ·      '; while(s.length<170) s+=unit;
+  e.textContent=s;
+  layer.appendChild(e);
+}
+
+// The Aperture knockout: the name as masked letterforms with a fill image showing through,
+// built as an inline SVG (clipPath text over a clipped <image>) so the fill survives PNG export.
+// The fill <image> sits inside a <g clip-path> and is transformed independently, so the pattern
+// can be zoomed/nudged within the fixed letterform clip.
+function addAperture(layer, g, word, fillURL, fillState, opts){
+  opts=opts||{}; word=word||'';
+  const ns='http://www.w3.org/2000/svg', xl='http://www.w3.org/1999/xlink';
+  const fontFam=opts.font||'"Emberly", Georgia, serif', weight=opts.weight||900;
+  const target=g.spanW(6), left=g.colX(0), top=opts.top!=null?opts.top:g.fy(0.18);
+  // fit font-size to the live width on one line
+  const cv=document.createElement('canvas'); const m=cv.getContext('2d');
+  const measure=s=>{ m.font=`${weight} ${s}px ${fontFam}`; return m.measureText(word).width||1; };
+  let size=opts.size||260; const w0=measure(size);
+  if(w0>target) size=Math.max(48, Math.floor(size*target/w0));
+  const svgW=target, svgH=Math.round(size*1.06), baseY=Math.round(size*0.80);
+  const cxc=svgW/2, cyc=svgH/2;
+  const fs=fillState.scale||1, fx=fillState.x||0, fy=fillState.y||0;
+  const clipId='apclip_'+Math.random().toString(36).slice(2,9);
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('width',svgW); svg.setAttribute('height',svgH);
+  svg.setAttribute('viewBox',`0 0 ${svgW} ${svgH}`);
+  svg.setAttribute('xmlns',ns); svg.setAttribute('xmlns:xlink',xl);
+  svg.style.position='absolute'; svg.style.left=left+'px'; svg.style.top=top+'px'; svg.style.overflow='visible';
+  const mkText=()=>{ const t=document.createElementNS(ns,'text');
+    t.setAttribute('x',0); t.setAttribute('y',baseY); t.setAttribute('font-family',fontFam);
+    t.setAttribute('font-weight',weight); t.setAttribute('font-size',size); t.setAttribute('font-style','normal');
+    t.textContent=word; return t; };
+  const defs=document.createElementNS(ns,'defs');
+  const clip=document.createElementNS(ns,'clipPath'); clip.setAttribute('id',clipId); clip.setAttribute('clipPathUnits','userSpaceOnUse');
+  clip.appendChild(mkText()); defs.appendChild(clip); svg.appendChild(defs);
+  const grp=document.createElementNS(ns,'g'); grp.setAttribute('clip-path',`url(#${clipId})`);
+  const img=document.createElementNS(ns,'image');
+  img.setAttribute('href',fillURL); img.setAttributeNS(xl,'xlink:href',fillURL);
+  img.setAttribute('x',0); img.setAttribute('y',0); img.setAttribute('width',svgW); img.setAttribute('height',svgH);
+  img.setAttribute('preserveAspectRatio','xMidYMid slice');
+  img.setAttribute('transform',`translate(${cxc} ${cyc}) scale(${fs}) translate(${-cxc} ${-cyc}) translate(${fx} ${fy})`);
+  grp.appendChild(img); svg.appendChild(grp);
+  if(opts.outline){ const o=mkText(); o.setAttribute('fill','none'); o.setAttribute('stroke',opts.outline);
+    o.setAttribute('stroke-width',opts.outlineW||1.1); svg.appendChild(o); }
+  layer.appendChild(svg);
+  return {size, height:svgH};
+}
+
+/* overlay gradient css */
+function overlayCss(kind){
+  switch(kind){
+    case 'scrim-bottom': return 'linear-gradient(180deg, transparent 42%, rgba(0,0,0,.62))';
+    case 'scrim-top':    return 'linear-gradient(180deg, rgba(0,0,0,.55), transparent 38%)';
+    case 'scrim-top-soft':return 'linear-gradient(180deg, rgba(0,0,0,.32), transparent 28%)';
+    case 'dark':         return 'rgba(0,0,0,.40)';
+    case 'darker':       return 'rgba(0,0,0,.58)';
+    case 'light':        return 'rgba(255,255,255,.46)';
+    case 'lift-bottom':  return 'linear-gradient(180deg, transparent 46%, rgba(255,255,255,.74))';
+    case 'lift-strong':  return 'linear-gradient(180deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.34) 52%, rgba(255,255,255,.80) 100%)';
+    case 'vignette':     return 'radial-gradient(circle at 50% 44%, transparent 38%, rgba(0,0,0,.55))';
+    default: return 'transparent';
+  }
+}
+
+/* ============================================================
+   LAYOUT ROSTER — independent template fns.
+   fn(env) -> { bg, ink, accent, field(g)->desc, overlays[], build(layer,add) }
+   Spanning severe → romantic deliberately.
+   ============================================================ */
+const LAYOUTS = [
+
+  // 1. ANCHOR — the workhorse. Full field, type over it.
+  { name:'Anchor', fn(env){
+    const {p,c,m,fmt}=env;
+    return {
+      bg:p.dark, ink:p.onDark, accent:lighten(p.color,.45),
+      overlays:['scrim-top-soft','scrim-bottom'],
+      field:g=>({left:0,top:0,width:g.W,height:g.H}),
+      build(layer,add){
+        add(layer,c.name,{c:0,span:4,top:env.g.fy(0.045),size:58,weight:700,font:'display',role:'name'});
+        if(c.swahili) add(layer,c.swahili,{c:0,span:4,top:env.g.fy(0.135),size:25,color:lighten(p.color,.55)});
+        add(layer,fmt(c.formula),{c:0,span:6,top:env.g.fy(0.40),size:148,weight:700,font:'display',raw:true,lh:140,fit:true});
+        if(m.annotation && c.annotation) add(layer,c.annotation,{c:0,span:4,top:env.g.fy(0.40)+150,size:14,font:'mono',color:rgba(p.onDark,.72),tracking:'.02em'});
+        if(c.receipt) add(layer,c.receipt,{c:0,span:3,top:env.g.fy(0.68),size:17,lh:24,white:'pre-line',color:rgba(p.onDark,.92)});
+        add(layer,heldHTML(c),{c:0,span:5,top:env.g.fy(0.885),size:16,raw:true});
+        if(m.binomial && c.binomial) add(layer,c.binomial,{c:0,span:5,top:env.g.fy(0.93),size:14,font:'mono',color:rgba(p.onDark,.66),tracking:'.04em'});
+        add(layer,c.series,{c:4,span:2,top:env.g.fy(0.045),size:12.5,font:'mono',align:'right',color:rgba(p.onDark,.7),tracking:'.12em'});
+        if(m.kanga) addKanga(layer,env.g,c,rgba(p.onDark,.55));
+      }
+    };
+  }},
+
+  // 2. MONOLITH — oversized name split over a soft full-bleed field.
+  { name:'Monolith', fn(env){
+    const {p,c,fmt,g}=env;
+    return {
+      bg:p.dark, ink:p.onDark, accent:lighten(p.color,.5),
+      overlays:['dark','scrim-bottom'],
+      field:g=>({left:0,top:0,width:g.W,height:g.H}),
+      build(layer,add){
+        const words=c.name.split(' ');
+        const mid=Math.ceil(words.length/2);
+        const l1=words.slice(0,mid).join(' '), l2=words.slice(mid).join(' ')||'';
+        add(layer,l1,{c:0,span:6,top:g.fy(0.30),size:120,weight:900,font:'display',lh:108,role:'name'});
+        if(l2) add(layer,l2,{c:0,span:6,top:g.fy(0.30)+Math.round(112*state.typeScale),size:120,weight:900,font:'display',lh:108,role:'name'});
+        add(layer,fmt(c.formula),{c:0,span:5,top:g.fy(0.85),size:34,weight:700,font:'display',raw:true,color:lighten(p.color,.55),fit:true});
+        add(layer,heldHTML(c),{c:0,span:6,top:g.fy(0.915),size:15,raw:true,color:rgba(p.onDark,.85)});
+        add(layer,c.series,{c:4,span:2,top:g.fy(0.045),size:12.5,font:'mono',align:'right',color:rgba(p.onDark,.7),tracking:'.12em'});
+      }
+    };
+  }},
+
+  // 3. THE EDGE — severe pole. Near-black, field as a sliver/partial sphere off the right.
+  { name:'The Edge', fn(env){
+    const {p,c,m,fmt,g}=env;
+    return {
+      bg:p.dark, ink:p.onDark, accent:lighten(p.color,.45),
+      overlays:[],
+      // a large circle pushed off the right edge -> partial sphere sliver
+      field:g=>({ left:g.W-Math.round(g.H*0.62), top:Math.round(g.H*0.19), width:Math.round(g.H*0.9), height:Math.round(g.H*0.9), circle:true, innerOverlay:null }),
+      build(layer,add){
+        add(layer,c.name,{c:0,span:3,top:g.fy(0.05),size:30,weight:900,font:'display',role:'name'});
+        if(c.swahili) add(layer,c.swahili,{c:0,span:3,top:g.fy(0.05)+40,size:16,color:lighten(p.color,.5)});
+        add(layer,fmt(c.formula),{c:0,span:3,top:g.fy(0.45),size:54,weight:700,font:'display',raw:true,lh:54,fit:true});
+        if(m.annotation && c.annotation) add(layer,c.annotation,{c:0,span:3,top:g.fy(0.45)+64,size:13,font:'mono',color:rgba(p.onDark,.6)});
+        add(layer,heldHTML(c),{c:0,span:3,top:g.fy(0.88),size:14,raw:true,color:rgba(p.onDark,.9)});
+        if(m.binomial && c.binomial) add(layer,c.binomial,{c:0,span:3,top:g.fy(0.925),size:12.5,font:'mono',color:rgba(p.onDark,.55),tracking:'.04em'});
+        add(layer,c.series,{c:0,span:3,top:g.fy(0.05)+62,size:11.5,font:'mono',color:rgba(p.onDark,.55),tracking:'.12em'});
+      }
+    };
+  }},
+
+  // 4. THE DISC — dense field as a central circle on near-black, type orbiting.
+  { name:'The Disc', fn(env){
+    const {p,c,fmt,g}=env;
+    const d=Math.round(g.W*0.56);
+    return {
+      bg:p.dark, ink:p.onDark, accent:lighten(p.color,.5),
+      overlays:[],
+      field:g=>({ left:Math.round((g.W-d)/2), top:Math.round((g.H-d)/2), width:d, height:d, circle:true }),
+      build(layer,add){
+        add(layer,c.name,{c:0,span:3,top:g.fy(0.07),size:40,weight:700,font:'display',role:'name'});
+        if(c.swahili) add(layer,c.swahili,{c:3,span:3,top:g.fy(0.07),size:22,align:'right',color:lighten(p.color,.55)});
+        add(layer,fmt(c.formula),{c:0,span:6,top:g.fy(0.80),size:60,weight:700,font:'display',raw:true,align:'center',fit:true});
+        add(layer,heldHTML(c),{c:0,span:6,top:g.fy(0.90),size:15,raw:true,align:'center',color:rgba(p.onDark,.88)});
+        add(layer,c.series,{c:0,span:6,top:g.fy(0.94),size:12,font:'mono',align:'center',color:rgba(p.onDark,.6),tracking:'.16em'});
+      }
+    };
+  }},
+
+  // 5. VERTICAL — name running up the right edge, type block lower-left. Swiss.
+  { name:'Vertical', fn(env){
+    const {p,c,m,fmt,g}=env;
+    return {
+      bg:p.paper, ink:p.ink, accent:p.color,
+      overlays:['light'],
+      // contained field in the right two columns
+      field:g=>({ left:g.colX(3), top:g.margin, width:g.spanW(3), height:g.liveH }),
+      build(layer,add){
+        // name vertical up the right edge
+        add(layer,c.name,{x:g.W-g.margin*0.62,top:g.fy(0.96),size:46,weight:700,font:'display',rotate:-90,origin:'left bottom',color:p.ink,white:'nowrap',css:{width:'auto'},role:'name'});
+        add(layer,fmt(c.formula),{c:0,span:3,top:g.fy(0.10),size:72,weight:700,font:'display',raw:true,color:p.color,lh:70,fit:true});
+        if(c.swahili) add(layer,c.swahili,{c:0,span:3,top:g.fy(0.30),size:24,color:p.ink});
+        if(c.receipt) add(layer,c.receipt,{c:0,span:3,top:g.fy(0.58),size:16,lh:24,white:'pre-line',color:rgba(p.ink,.85)});
+        add(layer,heldHTML(c),{c:0,span:3,top:g.fy(0.885),size:15,raw:true,color:p.ink});
+        if(m.binomial && c.binomial) add(layer,c.binomial,{c:0,span:3,top:g.fy(0.93),size:13,font:'mono',color:rgba(p.ink,.6)});
+        add(layer,c.series,{c:0,span:3,top:g.fy(0.05),size:12,font:'mono',color:rgba(p.ink,.6),tracking:'.12em'});
+        if(m.annotation && c.annotation) add(layer,c.annotation,{c:0,span:3,top:g.fy(0.20),size:13,font:'mono',color:rgba(p.ink,.6)});
+      }
+    };
+  }},
+
+  // 6. THE CASCADE — the name repeating and growing down the sheet.
+  { name:'The Cascade', fn(env){
+    const {p,c,fmt,g}=env;
+    return {
+      bg:p.dark, ink:p.onDark, accent:lighten(p.color,.5),
+      overlays:['darker'],
+      field:g=>({left:0,top:0,width:g.W,height:g.H}),
+      build(layer,add){
+        const sizes=[34,56,92,150];
+        const tops=[0.07,0.20,0.38,0.62];
+        sizes.forEach((s,i)=>{
+          add(layer,c.name,{c:0,span:6,top:g.fy(tops[i]),size:s,weight:i===3?900:700,font:'display',
+            color:i===3?p.onDark:rgba(p.onDark,.35+i*0.18),lh:s,role:'name'});
+        });
+        add(layer,fmt(c.formula),{c:0,span:4,top:g.fy(0.86),size:30,weight:700,font:'display',raw:true,color:lighten(p.color,.55),fit:true});
+        add(layer,heldHTML(c),{c:0,span:6,top:g.fy(0.92),size:14,raw:true,color:rgba(p.onDark,.85)});
+        add(layer,c.series,{c:4,span:2,top:g.fy(0.05),size:12,font:'mono',align:'right',color:rgba(p.onDark,.6),tracking:'.12em'});
+      }
+    };
+  }},
+
+  // 7. CORNER — field bloom in one corner, type block diagonally opposite.
+  { name:'Corner', fn(env){
+    const {p,c,m,fmt,g}=env;
+    const d=Math.round(g.W*0.66);
+    return {
+      bg:p.paper, ink:p.ink, accent:p.color,
+      overlays:[],
+      // disc anchored top-right, partly off-canvas
+      field:g=>({ left:g.W-Math.round(d*0.62), top:-Math.round(d*0.30), width:d, height:d, circle:true }),
+      build(layer,add){
+        add(layer,c.name,{c:0,span:4,top:g.fy(0.52),size:56,weight:700,font:'display',color:p.ink,role:'name'});
+        if(c.swahili) add(layer,c.swahili,{c:0,span:4,top:g.fy(0.63),size:24,color:p.color});
+        add(layer,fmt(c.formula),{c:0,span:5,top:g.fy(0.71),size:70,weight:700,font:'display',raw:true,color:p.color,lh:66,fit:true});
+        if(c.receipt) add(layer,c.receipt,{c:0,span:3,top:g.fy(0.05),size:16,lh:24,white:'pre-line',color:rgba(p.ink,.85)});
+        add(layer,heldHTML(c),{c:0,span:5,top:g.fy(0.89),size:15,raw:true,color:p.ink});
+        if(m.binomial && c.binomial) add(layer,c.binomial,{c:0,span:5,top:g.fy(0.935),size:13,font:'mono',color:rgba(p.ink,.6)});
+        add(layer,c.series,{c:0,span:3,top:g.fy(0.05)+ (c.receipt?96:0),size:12,font:'mono',color:rgba(p.ink,.6),tracking:'.12em'});
+        if(m.kanga) addKanga(layer,g,c,rgba(p.ink,.5));
+      }
+    };
+  }},
+
+  // 8. FORMULA-DOMINANT — formula at the largest scale.
+  { name:'Formula-dominant', fn(env){
+    const {p,c,m,fmt,g}=env;
+    return {
+      bg:p.dark, ink:p.onDark, accent:lighten(p.color,.5),
+      overlays:['darker','scrim-bottom'],
+      field:g=>({left:0,top:0,width:g.W,height:g.H}),
+      build(layer,add){
+        add(layer,c.name,{c:0,span:6,top:g.fy(0.10),size:30,weight:700,font:'display',color:rgba(p.onDark,.92),role:'name'});
+        add(layer,fmt(c.formula),{c:0,span:6,top:g.fy(0.30),size:210,weight:700,font:'display',raw:true,lh:188,fit:true});
+        if(m.annotation && c.annotation) add(layer,c.annotation,{c:0,span:6,top:g.fy(0.30)+205,size:15,font:'mono',color:rgba(p.onDark,.7)});
+        if(c.receipt) add(layer,c.receipt,{c:0,span:3,top:g.fy(0.70),size:16,lh:24,white:'pre-line',color:rgba(p.onDark,.9)});
+        add(layer,heldHTML(c),{c:0,span:6,top:g.fy(0.90),size:15,raw:true,color:rgba(p.onDark,.88)});
+        add(layer,c.series,{c:4,span:2,top:g.fy(0.10),size:12,font:'mono',align:'right',color:rgba(p.onDark,.65),tracking:'.12em'});
+      }
+    };
+  }},
+
+  // 9. CENTRED-SEVERE — centred axis, grotesk, clinical. (forces grotesk)
+  { name:'Centred-severe', forceVoice:'grotesk', fn(env){
+    const {p,c,m,fmt,g}=env;
+    const d=Math.round(g.W*0.30);
+    return {
+      bg:'#F4F4F1', ink:'#15151A', accent:p.color,
+      overlays:[],
+      field:g=>({ left:Math.round((g.W-d)/2), top:g.fy(0.36), width:d, height:d, circle:true, innerOverlay:null }),
+      build(layer,add){
+        add(layer,c.name,{c:0,span:6,top:g.fy(0.10),size:36,weight:900,font:'display',align:'center',color:'#15151A',tracking:'.01em',transform:'uppercase',role:'name'});
+        if(c.swahili) add(layer,c.swahili,{c:0,span:6,top:g.fy(0.165),size:16,align:'center',color:p.color,tracking:'.18em',transform:'uppercase'});
+        add(layer,fmt(c.formula),{c:0,span:6,top:g.fy(0.66),size:64,weight:700,font:'display',raw:true,align:'center',color:'#15151A',fit:true});
+        if(m.annotation && c.annotation) add(layer,c.annotation,{c:0,span:6,top:g.fy(0.76),size:13,font:'mono',align:'center',color:rgba('#15151A',.6)});
+        add(layer,heldHTML(c),{c:0,span:6,top:g.fy(0.86),size:14,raw:true,align:'center',color:'#15151A'});
+        if(m.binomial && c.binomial) add(layer,c.binomial,{c:0,span:6,top:g.fy(0.905),size:12.5,font:'mono',align:'center',color:rgba('#15151A',.6),tracking:'.06em'});
+        add(layer,c.series,{c:0,span:6,top:g.fy(0.945),size:11.5,font:'mono',align:'center',color:rgba('#15151A',.55),tracking:'.2em'});
+      }
+    };
+  }},
+
+  // 10. SOFT-ROMANCE — romantic pole. Huge tender bloom, name in the lower light.
+  { name:'Soft-romance', fn(env){
+    const {p,c,m,fmt,g}=env;
+    return {
+      bg:p.paper, ink:p.ink, accent:p.color,
+      overlays:['lift-strong'],
+      field:g=>({left:0,top:0,width:g.W,height:g.H}),
+      build(layer,add){
+        add(layer,c.name,{c:0,span:6,top:g.fy(0.64),size:64,weight:700,font:'display',color:p.ink,lh:62,role:'name'});
+        if(c.swahili) add(layer,c.swahili,{c:0,span:5,top:g.fy(0.745),size:26,color:darken(p.color,.1)});
+        add(layer,fmt(c.formula),{c:0,span:5,top:g.fy(0.81),size:40,weight:400,font:'display',raw:true,color:rgba(p.ink,.8),fit:true});
+        if(c.receipt) add(layer,c.receipt,{c:3,span:3,top:g.fy(0.05),size:16,lh:24,white:'pre-line',color:rgba(p.ink,.78),align:'right'});
+        add(layer,heldHTML(c),{c:0,span:6,top:g.fy(0.90),size:15,raw:true,color:p.ink});
+        if(m.binomial && c.binomial) add(layer,c.binomial,{c:0,span:6,top:g.fy(0.945),size:13,font:'mono',color:rgba(p.ink,.6)});
+        add(layer,c.series,{c:0,span:3,top:g.fy(0.05),size:12,font:'mono',color:rgba(p.ink,.6),tracking:'.12em'});
+      }
+    };
+  }},
+
+  // 11. ASSAY — the formula decomposed into stacked element-units, itemised down the
+  // grid like a receipt / lab assay. The molecule read as parts: a colour assembled at a cost.
+  // Insight borrowed from fcklck's syllabic stacking; re-rendered flat and on-grid, no tile chrome.
+  { name:'Assay', fn(env){
+    const {p,c,m,g}=env;
+    const tokens=parseFormula(c.formula);
+    return {
+      bg:p.paper, ink:p.ink, accent:p.color,
+      overlays:[],
+      // pigment field contained as a specimen swatch in the right two columns
+      field:g=>({ left:g.colX(4), top:g.margin, width:g.spanW(2), height:g.liveH }),
+      build(layer,add){
+        add(layer,c.series,{c:0,span:4,top:g.fy(0.045),size:12,font:'mono',color:rgba(p.ink,.6),tracking:'.12em'});
+        add(layer,c.name,{c:0,span:4,top:g.fy(0.085),size:30,weight:700,font:'display',color:p.ink,role:'name'});
+        if(c.swahili) add(layer,c.swahili,{c:0,span:4,top:g.fy(0.085)+40,size:18,color:p.color});
+        if(m.annotation && c.annotation) add(layer,c.annotation,{c:0,span:4,top:g.fy(0.085)+70,size:13,font:'mono',color:rgba(p.ink,.6)});
+        // the assay: one element-unit per row, adaptive to 3–5 units, baseline-snapped
+        const top0=g.fy(0.32), top1=g.fy(0.84);
+        const n=Math.max(tokens.length,1);
+        const step=(top1-top0)/n;
+        const size=Math.max(40,Math.min(116,Math.round(step*0.74)));
+        tokens.forEach((t,i)=>{
+          const html=escapeHtml(t.el)+(t.sub?('<sub>'+escapeHtml(t.sub)+'</sub>'):'');
+          add(layer,html,{c:0,span:4,top:Math.round(top0+i*step),size:size,weight:700,font:'mono',raw:true,fit:true,lh:size,color:p.ink});
+        });
+        if(m.binomial && c.binomial) add(layer,c.binomial,{c:0,span:4,top:g.fy(0.905),size:13,font:'mono',color:rgba(p.ink,.6)});
+        add(layer,heldHTML(c),{c:0,span:4,top:g.fy(0.95),size:15,raw:true,color:p.ink});
+        if(m.kanga) addKanga(layer,g,c,rgba(p.ink,.5));
+      }
+    };
+  }},
+
+  // 12. THE APERTURE — the name as a display knockout: a fill image (pigment field or uploaded
+  // pattern) shows through the masked letterforms against the dark page ground. The word becomes
+  // a window onto its own material. Used sparingly (Indigo, Indian Yellow). Field-as-fill, not full-bleed.
+  { name:'The Aperture', fn(env){
+    const {p,c,m,g,P,fmt}=env;
+    return {
+      bg:p.dark, ink:p.onDark, accent:lighten(p.color,.5),
+      overlays:[],
+      field:null,   // dark page ground; the fill lives only inside the aperture word
+      build(layer,add){
+        const pool=state.pools[P.key]||[];
+        const fieldSrc=pool[state.fieldIndex]||pool[0];
+        const ap=state.aperture;
+        const fillURL=(ap.source==='upload' && ap.upload) ? ap.upload : fieldSrc;
+        // the masked name — Emberly, the dominant element, fill showing through
+        addAperture(layer, g, c.name||'', fillURL, ap, {top:g.fy(0.19), size:260, outline:rgba(p.onDark,.30), outlineW:1.1, font:'"Emberly", Georgia, serif'});
+        if(c.swahili) add(layer,c.swahili,{c:0,span:5,top:g.fy(0.53),size:24,color:lighten(p.color,.5)});
+        // formula stays small + solid (mono), NOT filled
+        add(layer,fmt(c.formula),{c:0,span:4,top:g.fy(0.61),size:34,weight:400,raw:true,color:rgba(p.onDark,.92)});
+        if(m.annotation && c.annotation) add(layer,c.annotation,{c:0,span:4,top:g.fy(0.61)+42,size:13,font:'mono',color:rgba(p.onDark,.6)});
+        if(c.receipt) add(layer,c.receipt,{c:0,span:3,top:g.fy(0.71),size:16,lh:24,white:'pre-line',color:rgba(p.onDark,.9)});
+        add(layer,heldHTML(c),{c:0,span:5,top:g.fy(0.885),size:15,raw:true,color:p.onDark});
+        if(m.binomial && c.binomial) add(layer,c.binomial,{c:0,span:5,top:g.fy(0.93),size:13,font:'mono',color:rgba(p.onDark,.6)});
+        add(layer,c.series,{c:4,span:2,top:g.fy(0.06),size:12.5,font:'mono',align:'right',color:rgba(p.onDark,.7),tracking:'.12em'});
+        if(m.kanga) addKanga(layer,g,c,rgba(p.onDark,.5));
+      }
+    };
+  }}
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  pigmentIndex:0,
+  fieldIndex:0,
+  layoutIndex:0,
+  voice:'serif',
+  typeScale:1,
+  ratio:'3:4',
+  moves:{ kanga:true, binomial:true, annotation:false },
+  field:{ scale:1, x:0, y:0 },
+  aperture:{ source:'field', upload:null, scale:1, x:0, y:0 },   // The Aperture fill (independent of page field)
+  content:null,
+  pools:{}   // pigment.key -> [dataURL,...]
+};
+
+// init pools + content
+PIGMENTS.forEach(p=>{ state.pools[p.key]=[0,1,2].map(i=>makePlaceholder(p.colors,i)); });
+function loadPigment(i){
+  state.pigmentIndex=i;
+  state.content=JSON.parse(JSON.stringify(PIGMENTS[i].content));
+  state.fieldIndex=0;
+  state.field={scale:1,x:0,y:0};
+}
+loadPigment(0);
+
+/* ============================================================
+   TEXT FIELD DEFINITIONS
+   ============================================================ */
+const TEXT_FIELDS = [
+  {key:'name',label:'Pigment name'},
+  {key:'swahili',label:'Swahili line (the hinge)'},
+  {key:'formula',label:'Chemical formula',mono:true,hint:'digits → subscripts'},
+  {key:'annotation',label:'Formula annotation'},
+  {key:'receipt',label:'Receipt body',area:true},
+  {key:'held',label:'HELD line (the spine)'},
+  {key:'binomial',label:'Binomial / source'},
+  {key:'kanga',label:'Kanga margin'},
+  {key:'series',label:'Series number'}
+];
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const poster=document.getElementById('poster');
+const posterBox=document.getElementById('posterBox');
+const stage=document.getElementById('stage');
+
+function render(){
+  const P=PIGMENTS[state.pigmentIndex];
+  const pal=P.colors;
+  const layout=LAYOUTS[state.layoutIndex];
+  const fonts=VOICES[layout.forceVoice || state.voice];
+  const r=RATIOS[state.ratio];
+  const W=BASE_W, H=Math.round(W*r.h/r.w);
+  const g=geo(W,H);
+
+  const env={ g, p:pal, c:state.content, m:state.moves, fmt:formatFormula, esc:escapeHtml, P };
+  const cfg=layout.fn(env);
+
+  // reset poster
+  poster.innerHTML='';
+  poster.style.width=W+'px';
+  poster.style.height=H+'px';
+  poster.style.background=cfg.bg;
+
+  // field layer
+  const src=(state.pools[P.key]||[])[state.fieldIndex] || state.pools[P.key][0];
+  const desc=cfg.field ? cfg.field(g) : null;   // some layouts (The Aperture) use no page field
+  if(desc) buildField(poster, desc, src, state.field);
+
+  // full-poster overlays
+  (cfg.overlays||[]).forEach(k=>{
+    const ov=document.createElement('div');
+    ov.style.position='absolute'; ov.style.inset='0'; ov.style.pointerEvents='none';
+    ov.style.background=overlayCss(k);
+    poster.appendChild(ov);
+  });
+
+  // content layer
+  const layer=document.createElement('div');
+  layer.style.position='absolute'; layer.style.inset='0';
+  poster.appendChild(layer);
+  const add=mkAdd(g, fonts, cfg.ink);
+  cfg.build(layer, add);
+
+  // footer
+  document.getElementById('footName').textContent=layout.name;
+  document.getElementById('footNum').textContent=`· Layout ${state.layoutIndex+1} / ${LAYOUTS.length}`;
+  document.getElementById('layoutHint').textContent=`${state.layoutIndex+1} / ${LAYOUTS.length}`;
+
+  applyFit();
+  syncActiveStates();
+}
+
+function buildField(parent, desc, src, fs){
+  const wrap=document.createElement('div');
+  wrap.style.position='absolute';
+  wrap.style.left=desc.left+'px'; wrap.style.top=desc.top+'px';
+  wrap.style.width=desc.width+'px'; wrap.style.height=desc.height+'px';
+  wrap.style.overflow='hidden';
+  if(desc.circle) wrap.style.borderRadius='50%';
+  const img=document.createElement('div');
+  img.style.position='absolute'; img.style.inset='0';
+  img.style.backgroundImage=`url("${src}")`;
+  img.style.backgroundSize='cover';
+  img.style.backgroundPosition='center';
+  img.style.transformOrigin='center';
+  img.style.transform=`scale(${fs.scale}) translate(${fs.x}px, ${fs.y}px)`;
+  wrap.appendChild(img);
+  if(desc.innerOverlay){
+    const o=document.createElement('div');
+    o.style.position='absolute'; o.style.inset='0'; o.style.background=overlayCss(desc.innerOverlay);
+    wrap.appendChild(o);
+  }
+  parent.appendChild(wrap);
+}
+
+function applyFit(){
+  const W=parseFloat(poster.style.width), H=parseFloat(poster.style.height);
+  const aw=stage.clientWidth-68, ah=stage.clientHeight-68;
+  const scale=Math.min(aw/W, ah/H);
+  poster.style.transform=`scale(${scale})`;
+  posterBox.style.width=(W*scale)+'px';
+  posterBox.style.height=(H*scale)+'px';
+}
+window.addEventListener('resize', applyFit);
+
+/* ============================================================
+   SIDEBAR WIRING
+   ============================================================ */
+// pigment segmented
+const pigmentSeg=document.getElementById('pigmentSeg');
+PIGMENTS.forEach((p,i)=>{
+  const b=document.createElement('button'); b.textContent=p.label; b.dataset.i=i;
+  b.onclick=()=>{ loadPigment(i); buildTextFields(); render(); updateFieldReadout(); };
+  pigmentSeg.appendChild(b);
+});
+
+// layout grid
+const layoutGrid=document.getElementById('layoutGrid');
+LAYOUTS.forEach((l,i)=>{
+  const b=document.createElement('button'); b.dataset.i=i;
+  b.innerHTML=`<span class="n">${String(i+1).padStart(2,'0')}</span><span>${l.name}</span>`;
+  b.onclick=()=>{ state.layoutIndex=i; render(); };
+  layoutGrid.appendChild(b);
+});
+
+// voice
+document.querySelectorAll('#voiceSeg button').forEach(b=>{
+  b.onclick=()=>{ state.voice=b.dataset.voice; render(); };
+});
+// ratio
+document.querySelectorAll('#ratioSeg button').forEach(b=>{
+  b.onclick=()=>{ state.ratio=b.dataset.ratio; render(); };
+});
+
+// text fields
+const textFields=document.getElementById('textFields');
+function buildTextFields(){
+  textFields.innerHTML='';
+  TEXT_FIELDS.forEach(f=>{
+    const wrap=document.createElement('div'); wrap.className='ctrl';
+    const cl=document.createElement('div'); cl.className='cl';
+    cl.innerHTML=`<span>${f.label}</span>${f.hint?`<span style="text-transform:none">${f.hint}</span>`:''}`;
+    wrap.appendChild(cl);
+    const el=document.createElement(f.area?'textarea':'input');
+    el.className='field-input';
+    if(f.mono) el.style.fontFamily='var(--mono)';
+    el.value=state.content[f.key]||'';
+    el.addEventListener('input',()=>{ state.content[f.key]=el.value; render(); });
+    wrap.appendChild(el);
+    textFields.appendChild(wrap);
+  });
+}
+buildTextFields();
+
+// moves
+const MOVES=[
+  {key:'kanga',label:'Kanga margin',sub:'running marginal record'},
+  {key:'binomial',label:'Binomial / source',sub:'the specimen line'},
+  {key:'annotation',label:'Formula annotation',sub:'mono caption'}
+];
+const movesWrap=document.getElementById('movesWrap');
+MOVES.forEach(mv=>{
+  const row=document.createElement('div'); row.className='toggle';
+  const left=document.createElement('div');
+  left.innerHTML=`<div class="tlabel">${mv.label}</div><div class="tsub">${mv.sub}</div>`;
+  const sw=document.createElement('div'); sw.className='switch'+(state.moves[mv.key]?' on':'');
+  sw.onclick=()=>{ state.moves[mv.key]=!state.moves[mv.key]; sw.classList.toggle('on'); render(); };
+  row.appendChild(left); row.appendChild(sw);
+  movesWrap.appendChild(row);
+});
+
+// field controls
+function updateFieldReadout(){
+  const n=(state.pools[PIGMENTS[state.pigmentIndex].key]||[]).length;
+  document.getElementById('fieldReadout').textContent=`Field ${state.fieldIndex+1} / ${n}`;
+}
+function poolLen(){ return (state.pools[PIGMENTS[state.pigmentIndex].key]||[]).length; }
+document.getElementById('fieldPrev').onclick=()=>{ const n=poolLen(); state.fieldIndex=(state.fieldIndex-1+n)%n; updateFieldReadout(); render(); };
+document.getElementById('fieldNext').onclick=()=>{ const n=poolLen(); state.fieldIndex=(state.fieldIndex+1)%n; updateFieldReadout(); render(); };
+document.getElementById('fieldShuffle').onclick=()=>{ const n=poolLen(); state.fieldIndex=Math.floor(Math.random()*n); updateFieldReadout(); render(); };
+document.getElementById('fieldUpload').onchange=(e)=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ const key=PIGMENTS[state.pigmentIndex].key; state.pools[key].push(reader.result); state.fieldIndex=state.pools[key].length-1; updateFieldReadout(); render(); };
+  reader.readAsDataURL(file);
+  e.target.value='';
+};
+const scaleEl=document.getElementById('fieldScale');
+scaleEl.oninput=()=>{ state.field.scale=parseFloat(scaleEl.value); document.getElementById('scaleVal').textContent=state.field.scale.toFixed(2)+'×'; render(); };
+
+// type scale
+const typeScaleEl=document.getElementById('typeScale');
+function setTypeScale(v){ state.typeScale=v; typeScaleEl.value=v; document.getElementById('typeScaleVal').textContent=v.toFixed(2)+'×'; render(); }
+typeScaleEl.oninput=()=>setTypeScale(parseFloat(typeScaleEl.value));
+document.getElementById('typeScaleReset').onclick=()=>setTypeScale(1);
+const STEP=28;
+document.getElementById('posUp').onclick=()=>{ state.field.y-=STEP; render(); };
+document.getElementById('posDown').onclick=()=>{ state.field.y+=STEP; render(); };
+document.getElementById('posLeft').onclick=()=>{ state.field.x-=STEP; render(); };
+document.getElementById('posRight').onclick=()=>{ state.field.x+=STEP; render(); };
+document.getElementById('posReset').onclick=()=>{ state.field={scale:1,x:0,y:0}; scaleEl.value=1; document.getElementById('scaleVal').textContent='1.00×'; render(); };
+
+// aperture fill controls (independent of the page field)
+document.querySelectorAll('#apSrcSeg button').forEach(b=>{
+  b.onclick=()=>{ state.aperture.source=b.dataset.apsrc; render(); };
+});
+document.getElementById('apUpload').onchange=(e)=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ state.aperture.upload=reader.result; state.aperture.source='upload'; render(); };
+  reader.readAsDataURL(file);
+  e.target.value='';
+};
+const apScaleEl=document.getElementById('apScale');
+apScaleEl.oninput=()=>{ state.aperture.scale=parseFloat(apScaleEl.value); document.getElementById('apScaleVal').textContent=state.aperture.scale.toFixed(2)+'×'; render(); };
+document.getElementById('apUp').onclick=()=>{ state.aperture.y-=STEP; render(); };
+document.getElementById('apDown').onclick=()=>{ state.aperture.y+=STEP; render(); };
+document.getElementById('apLeft').onclick=()=>{ state.aperture.x-=STEP; render(); };
+document.getElementById('apRight').onclick=()=>{ state.aperture.x+=STEP; render(); };
+document.getElementById('apPosReset').onclick=()=>{ state.aperture.scale=1; state.aperture.x=0; state.aperture.y=0; apScaleEl.value=1; document.getElementById('apScaleVal').textContent='1.00×'; render(); };
+
+// layout cycling / shuffle / surprise
+function prevLayout(){ state.layoutIndex=(state.layoutIndex-1+LAYOUTS.length)%LAYOUTS.length; render(); }
+function nextLayout(){ state.layoutIndex=(state.layoutIndex+1)%LAYOUTS.length; render(); }
+function shuffle(){ state.layoutIndex=Math.floor(Math.random()*LAYOUTS.length); render(); }
+function surprise(){
+  state.layoutIndex=Math.floor(Math.random()*LAYOUTS.length);
+  state.fieldIndex=Math.floor(Math.random()*poolLen());
+  state.voice=Math.random()<0.5?'serif':'grotesk';
+  updateFieldReadout(); render();
+}
+document.getElementById('prevBtn').onclick=prevLayout;
+document.getElementById('nextBtn').onclick=nextLayout;
+document.getElementById('shuffleBtn').onclick=shuffle;
+document.getElementById('shuffleBtn2').onclick=shuffle;
+document.getElementById('surpriseBtn').onclick=surprise;
+document.getElementById('surpriseBtn2').onclick=surprise;
+
+function syncActiveStates(){
+  pigmentSeg.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===state.pigmentIndex));
+  layoutGrid.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===state.layoutIndex));
+  document.querySelectorAll('#voiceSeg button').forEach(b=>b.classList.toggle('on',b.dataset.voice===state.voice));
+  document.querySelectorAll('#ratioSeg button').forEach(b=>b.classList.toggle('on',b.dataset.ratio===state.ratio));
+  document.querySelectorAll('#apSrcSeg button').forEach(b=>b.classList.toggle('on',b.dataset.apsrc===state.aperture.source));
+}
+
+/* ============================================================
+   EXPORT — SVG foreignObject -> canvas. Fonts inlined as base64
+   so web fonts + subscripts + the field image all render.
+   ============================================================ */
+let FONT_CSS_CACHE=null;
+function ab2b64(buf){
+  let bin=''; const bytes=new Uint8Array(buf); const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){ bin+=String.fromCharCode.apply(null, bytes.subarray(i,i+chunk)); }
+  return btoa(bin);
+}
+async function buildFontCSS(){
+  if(FONT_CSS_CACHE!==null) return FONT_CSS_CACHE;
+  const url='https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;700&family=Playfair+Display:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap';
+  try{
+    let css=await (await fetch(url)).text();
+    const urls=[...new Set([...css.matchAll(/url\((https:[^)]+\.woff2?)\)/g)].map(m=>m[1]))];
+    for(const u of urls){
+      const buf=await (await fetch(u)).arrayBuffer();
+      css=css.split(u).join('data:font/woff2;base64,'+ab2b64(buf));
+    }
+    FONT_CSS_CACHE=css;
+  }catch(err){
+    console.warn('Font inlining failed; export will use system fallback fonts.',err);
+    FONT_CSS_CACHE='';
+  }
+  return FONT_CSS_CACHE;
+}
+
+async function exportPNG(){
+  const btn=document.getElementById('exportBtn');
+  const old=btn.textContent; btn.textContent='Rendering…';
+  try{
+    const fontCSS=await buildFontCSS();
+    const W=parseFloat(poster.style.width), H=parseFloat(poster.style.height);
+    const SCALE=2;
+
+    const clone=poster.cloneNode(true);
+    clone.style.transform='none';
+    clone.style.margin='0';
+
+    const embedCSS=`
+      *{box-sizing:border-box; font-style:normal !important;}
+      sub{font-size:.60em; line-height:0; vertical-align:-0.16em; font-weight:inherit;}
+      .kanga{writing-mode:vertical-rl; text-orientation:sideways; font-family:"IBM Plex Mono",ui-monospace,monospace;
+        white-space:nowrap; overflow:hidden;}
+      ${fontCSS}
+    `;
+    const xhtml=new XMLSerializer().serializeToString(clone);
+    const svg=
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${W*SCALE}" height="${H*SCALE}" viewBox="0 0 ${W} ${H}">`+
+      `<foreignObject x="0" y="0" width="${W}" height="${H}">`+
+      `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${W}px;height:${H}px;">`+
+      `<style>${embedCSS}</style>${xhtml}</div>`+
+      `</foreignObject></svg>`;
+
+    const blobUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+    const img=new Image();
+    await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=blobUrl; });
+
+    const canvas=document.createElement('canvas');
+    canvas.width=W*SCALE; canvas.height=H*SCALE;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0,W*SCALE,H*SCALE);
+
+    let dataURL;
+    try{ dataURL=canvas.toDataURL('image/png'); }
+    catch(secErr){ alert('Export was blocked by the browser (canvas tainted). Chrome handles this best — try opening the file in Chrome.'); throw secErr; }
+
+    const pName=PIGMENTS[state.pigmentIndex].key;
+    const lName=LAYOUTS[state.layoutIndex].name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+    const a=document.createElement('a');
+    a.download=`pigment-${pName}-${lName}.png`;
+    a.href=dataURL; a.click();
+  }catch(err){
+    console.error(err);
+  }finally{
+    btn.textContent=old;
+  }
+}
+document.getElementById('exportBtn').onclick=exportPNG;
+document.getElementById('exportBtn2').onclick=exportPNG;
+
+/* ============================================================
+   REAL FIELDS — culled keepers, loaded over the placeholders.
+   Fetched relative to this file and converted to data URLs so
+   they ride the same pipeline as uploads and the PNG export
+   canvas stays untainted. Requires serving over http (the
+   .claude/serve.js launch config); under file:// the fetch
+   fails silently and the placeholders remain.
+   ============================================================ */
+const REAL_FIELDS = {
+  ultramarine: [
+    'fields/ultramarine/ultramarine_bloom_object_v3.png',      // BLOOM·OBJECT → The Disc
+    'fields/ultramarine/ultramarine_bloom_lift_v6.png',        // BLOOM·LIFT → Soft-romance, Vertical
+    'fields/ultramarine/ultramarine_specimen_object_v2.png',   // SPECIMEN·OBJECT → The Edge, Centred-severe
+    'fields/ultramarine/ultramarine_editorial_planet_v01.png', // EDITORIAL severe/object
+    'fields/ultramarine/ultramarine_editorial_smoke_v08.png',  // EDITORIAL romantic/body — passed on Orpah's veto, 2026-07-06
+  ],
+  'indian-yellow': [
+    'fields/indian-yellow/indian_yellow_bloom_object_v05.png',    // BLOOM·OBJECT → The Disc
+    'fields/indian-yellow/indian_yellow_bloom_lift_v08.png',      // BLOOM·LIFT → Soft-romance, Vertical
+    'fields/indian-yellow/indian_yellow_specimen_object_v01.png', // SPECIMEN·OBJECT → The Edge, Centred-severe
+    'fields/indian-yellow/indian_yellow_editorial_vessel_v04.png',// EDITORIAL severe/object
+    // 'fields/indian-yellow/indian_yellow_editorial_body_v03.png' — held out pending review (romantic/body gate)
+  ],
+};
+const PLACEHOLDER_COUNT = 3; // pools are seeded with this many synthetic blooms
+async function loadRealFields(){
+  for(const [key, paths] of Object.entries(REAL_FIELDS)){
+    const loaded=[];
+    for(const path of paths){
+      try{
+        const res=await fetch(path); if(!res.ok) continue;
+        const blob=await res.blob();
+        loaded.push(await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(blob); }));
+      }catch(e){ /* file:// or missing file — placeholders stay */ }
+    }
+    if(!loaded.length) continue;
+    // real fields replace the placeholders; anything uploaded meanwhile survives after them
+    state.pools[key]=loaded.concat(state.pools[key].slice(PLACEHOLDER_COUNT));
+    if(PIGMENTS[state.pigmentIndex].key===key){ state.fieldIndex=0; updateFieldReadout(); render(); }
+  }
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+updateFieldReadout();
+render();
+loadRealFields();
+// re-render once webfonts settle, so first paint uses real metrics
+if(document.fonts && document.fonts.ready){ document.fonts.ready.then(()=>render()); }
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Generated output — these tools make files; the files are not the tool
+exports/
+fields/
+fragments/
+samples/
+*.mp4
+*.mov
+*.webm
+
+# Source imagery and plates (large, and not all of it is ours to redistribute)
+plate-assets/
+*.psd
+
+# Fonts — licensed per-seat, never redistributed
+*.ttf
+*.otf
+*.woff
+*.woff2
+
+# Tooling and local config
+.claude/
+node_modules/
+.DS_Store

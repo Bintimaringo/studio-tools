@@ -1,0 +1,23 @@
+{
+  "format": "breathing-room-recipe",
+  "version": 1,
+  "saved": "2026-08-21T00:00:00.000Z",
+  "name": "osmosis-breath",
+  "mode": "both",
+  "amp": 0.3,
+  "spread": 3,
+  "tin": 2600,
+  "thold": 500,
+  "tout": 2600,
+  "trest": 900,
+  "ease": "out3",
+  "ground": "plates",
+  "ink": "#3A4247",
+  "paper": "#E4E8EA",
+  "ratio": "16:9",
+  "mw": 0.66,
+  "long": 1920,
+  "cycles": 3,
+  "markSrc": "/osmosis/wordmark.svg",
+  "plateSrc": ["/osmosis/ground-warm.png", "/osmosis/ground-cool.png"]
+}
