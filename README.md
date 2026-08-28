@@ -1,8 +1,7 @@
 # Studio Tools
 
 Instruments built at [Binti Maringo](https://bintimaringo.studio) for the studio's
-own work. Each one exists because a thing needed doing repeatedly and by hand,
-and doing it by hand kept producing the same three mistakes.
+own work.
 
 They are single-file HTML. No build step, no dependencies, no install. Open one
 in a browser and it runs.
